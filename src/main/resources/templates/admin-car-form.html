@@ -1,0 +1,54 @@
+<th:block th:with="title=${titleForm} ?: 'Автомобиль', active='admin'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+
+        <div class="page-head">
+            <h2 th:text="${titleForm}">Автомобиль</h2>
+            <a class="btn btn--light" th:href="@{/admin/cars}">← Назад</a>
+        </div>
+
+        <form class="card form" th:object="${car}"
+              th:action="${car.id} != null ? @{|/admin/cars/${car.id}|} : @{/admin/cars}"
+              method="post">
+
+            <div class="form__grid">
+                <div>
+                    <label>Марка</label>
+                    <input th:field="*{make}" required>
+                    <small class="muted" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
+                </div>
+                <div>
+                    <label>Модель</label>
+                    <input th:field="*{model}" required>
+                    <small class="muted" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
+                </div>
+                <div>
+                    <label>Класс</label>
+                    <input th:field="*{vehicleClass}" placeholder="economy / business / suv" required>
+                    <small class="muted" th:if="${#fields.hasErrors('vehicleClass')}" th:errors="*{vehicleClass}"></small>
+                </div>
+                <div>
+                    <label>Коробка</label>
+                    <select th:field="*{transmission}" required>
+                        <option value="AT">AT</option>
+                        <option value="MT">MT</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Год</label>
+                    <input type="number" th:field="*{year}" min="1980" max="2100" required>
+                </div>
+                <div>
+                    <label>Цена, ₽/день</label>
+                    <input type="number" th:field="*{dailyPrice}" min="1" step="1" required>
+                </div>
+                <div>
+                    <label><input type="checkbox" th:field="*{available}"> Доступен</label>
+                </div>
+            </div>
+
+            <button class="btn" type="submit">Сохранить</button>
+        </form>
+
+    </th:block>
+</th:block>

@@ -1,0 +1,11 @@
+<!-- 404 -->
+<th:block th:with="title='Страница не найдена', active=''"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+        <div class="card card--wide">
+            <h2>404 — Не найдено</h2>
+            <p class="muted">Страница отсутствует или была перемещена.</p>
+            <a class="btn" th:href="@{/}">На главную</a>
+        </div>
+    </th:block>
+</th:block>

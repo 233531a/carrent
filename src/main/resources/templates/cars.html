@@ -1,0 +1,90 @@
+<th:block th:with="title='Автомобили', active='cars'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+
+        <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom:16px;">
+            <span class="chip" th:text="${mode == 'taxi' ? 'Спец-предложения для такси' :
+                                         (mode == 'delivery' ? 'Спец-предложения для доставки' : mode)}">Режим</span>
+            <p class="car__meta" style="margin-top:8px;">
+                Здесь показываются автомобили, подходящие под выбранное направление.
+            </p>
+        </div>
+
+        <h2 class="page-title">Каталог автомобилей</h2>
+
+        <!-- Фильтры показываем только в обычном каталоге -->
+        <form class="card form form--filters"
+              th:action="@{/cars}" method="get"
+              th:if="${mode == null or mode == 'regular'}">
+            <div class="form__grid">
+                <div>
+                    <label>Марка/Модель</label>
+                    <input type="text" name="q" placeholder="Например, Toyota" th:value="${q}">
+                </div>
+                <div>
+                    <label>Класс</label>
+                    <select name="vehicleClass" th:value="${vehicleClass}">
+                        <option value="">Любой</option>
+                        <option>economy</option>
+                        <option>compact</option>
+                        <option>midsize</option>
+                        <option>fullsize</option>
+                        <option>suv</option>
+                        <option>premium</option>
+                    </select>
+                </div>
+                <div>
+                    <label>КПП</label>
+                    <select name="transmission" th:value="${transmission}">
+                        <option value="">Любая</option>
+                        <option>automatic</option>
+                        <option>manual</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Цена до, ₽/день</label>
+                    <input type="number" name="maxPrice" step="100" th:value="${maxPrice}">
+                </div>
+            </div>
+            <div class="form__actions">
+                <button class="btn" type="submit">Фильтровать</button>
+                <a class="btn btn--light" th:href="@{/cars}">Сбросить</a>
+            </div>
+        </form>
+
+        <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
+            <article class="card car" th:each="c : ${cars}">
+                <div class="car__head">
+                    <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
+                    <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
+                          th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
+                </div>
+                <p class="car__meta">
+                    <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
+                    <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
+                    <span th:text="'Год: ' + ${c.year}">Year</span>
+                </p>
+
+                <div class="car__price">
+                    <div>
+                        <div class="price"
+                             th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
+                        <div th:if="${mode != null && mode != 'regular'}"
+                             class="text-muted" style="color:#a7b0c0; font-size:13px; margin-top:4px;">
+                            Спец-тариф: условия уточняются при оформлении
+                        </div>
+                    </div>
+
+                    <!-- Кнопка брони -->
+                    <a class="btn" th:href="@{/booking(carId=${c.id})}" sec:authorize="isAuthenticated()">Забронировать</a>
+                    <a class="btn btn--light" th:href="@{/login(from='booking')}" sec:authorize="isAnonymous()">Забронировать</a>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty" th:if="${#lists.size(cars) == 0}">
+            <p>Ничего не найдено. Попробуйте изменить фильтры.</p>
+        </div>
+
+    </th:block>
+</th:block>

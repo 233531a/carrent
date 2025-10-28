@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body th:replace="~{'layout' :: layout(${title}, 'cars', ~{::section})}">
+<section>
+    <h1 class="page-title">Спецпредложения для доставки</h1>
+    <div class="alert">Доступно только для сотрудников с ролью WORKER (ROLE_EMPLOYEE).</div>
+    <div class="empty">Здесь будет список автомобилей для доставки.</div>
+</section>
+</body>
+</html>

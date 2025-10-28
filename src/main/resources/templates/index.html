@@ -1,0 +1,32 @@
+<th:block th:with="title='Главная', active='home'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+
+        <section class="hero">
+            <div class="hero__content">
+                <h1>Аренда авто — быстро и прозрачно</h1>
+                <p>Выбирайте из десятков предложений и бронируйте в пару кликов.</p>
+                <div class="hero__actions">
+                    <a class="btn" th:href="@{/cars}">Посмотреть автомобили</a>
+                    <a class="btn btn--light" th:href="@{/booking}">Оформить бронь</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid--3" style="margin-top:16px">
+            <article class="card">
+                <h3>Честные цены</h3>
+                <p>Никаких скрытых платежей — всё видно до оплаты.</p>
+            </article>
+            <article class="card">
+                <h3>Поддержка 24/7</h3>
+                <p>Поможем с выбором и ответим на любые вопросы.</p>
+            </article>
+            <article class="card">
+                <h3>Гибкие условия</h3>
+                <p>Дневная/почасовая аренда, долгосрочно, корпоративно.</p>
+            </article>
+        </section>
+
+    </th:block>
+</th:block>

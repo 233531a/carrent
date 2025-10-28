@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class CarrentApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(CarrentApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(CarrentApplication.class, args);
+        System.out.println("Приложение запущено http://localhost:8080/");
+    }
 }

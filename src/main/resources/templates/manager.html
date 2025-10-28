@@ -1,0 +1,84 @@
+<th:block th:with="title='Заявки и аренды', active='manager'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+
+        <h2 class="page-title">Заявки и аренды</h2>
+
+        <form class="card form" th:action="@{/manager/rentals}" method="get" style="margin-bottom:12px;">
+            <div class="form__grid">
+                <div>
+                    <label>Статус</label>
+                    <select name="status" th:value="${status}">
+                        <option value="ALL">Все</option>
+                        <option value="PENDING">Заявки (PENDING)</option>
+                        <option value="ACTIVE">Активные</option>
+                        <option value="REJECTED">Отклонённые</option>
+                        <option value="CANCELLED">Отменённые</option>
+                        <option value="COMPLETED">Завершённые</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Поиск</label>
+                    <input type="text" name="q" placeholder="Логин, авто или ID"
+                           th:value="${q}">
+                </div>
+            </div>
+            <div class="form__actions">
+                <button class="btn" type="submit">Применить</button>
+                <a class="btn btn--light" th:href="@{/manager/rentals}">Сбросить</a>
+            </div>
+        </form>
+
+        <div class="table-wrap card" th:if="${#lists.size(rentals) > 0}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Создано</th>
+                    <th>Пользователь</th>
+                    <th>Авто</th>
+                    <th>Период</th>
+                    <th>Итог</th>
+                    <th>Статус</th>
+                    <th style="width:240px;">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rentals}">
+                    <td th:text="${r.id}"></td>
+                    <td th:text="${#temporals.format(r.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+                    <td th:text="${r.customer != null && r.customer.user != null ? r.customer.user.username : '-'}"></td>
+                    <td th:text="${r.car != null ? r.car.make + ' ' + r.car.model : '-'}"></td>
+                    <td th:text="${#temporals.format(r.startDate,'dd.MM.yyyy')} + ' — ' + ${#temporals.format(r.endDate,'dd.MM.yyyy')}"></td>
+                    <td th:text="${#numbers.formatDecimal(r.totalAmount,0,'COMMA',0,'POINT')} + ' ₽'"></td>
+                    <td>
+                        <span class="chip"
+                              th:text="${r.status}"
+                              th:classappend="${
+                                  r.status.name()=='ACTIVE' ? ' chip--ok' :
+                                  (r.status.name()=='PENDING' ? ' chip--warn' : '')
+                              }"></span>
+                    </td>
+                    <td>
+                        <div class="form__actions">
+                            <form th:if="${r.status.name()=='PENDING'}" th:action="@{|/manager/rentals/${r.id}/approve|}" method="post">
+                                <button class="btn btn--sm" type="submit">Одобрить</button>
+                            </form>
+                            <form th:if="${r.status.name()=='PENDING'}" th:action="@{|/manager/rentals/${r.id}/reject|}" method="post">
+                                <button class="btn btn--sm btn--danger" type="submit">Отклонить</button>
+                            </form>
+                            <form th:if="${r.status.name()=='ACTIVE'}" th:action="@{|/manager/rentals/${r.id}/complete|}" method="post">
+                                <button class="btn btn--sm" type="submit">Завершить</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty" th:if="${#lists.size(rentals) == 0}">
+            <p>Ничего не найдено.</p>
+        </div>
+    </th:block>
+</th:block>

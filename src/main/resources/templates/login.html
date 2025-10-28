@@ -1,0 +1,42 @@
+<th:block th:with="title='Вход', active='login'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+    <th:block th:fragment="content">
+        <div class="auth-card card">
+            <h2 class="page-title">Войти в аккаунт</h2>
+
+            <p class="alert alert--warn" th:if="${param.error}">Неверный логин или пароль.</p>
+            <p class="alert" th:if="${param.logout}">Вы вышли из аккаунта.</p>
+
+            <form th:action="@{/login}" method="post" class="form form--auth">
+                <div class="form__grid">
+                    <div>
+                        <label>Логин</label>
+                        <input type="text" name="username" placeholder="your.name" autofocus required />
+                    </div>
+                    <div>
+                        <label>Пароль</label>
+                        <div class="input-with-action">
+                            <input id="loginPassword" type="password" name="password" placeholder="••••••••" required />
+                            <button type="button" class="input-action" onclick="togglePwd('loginPassword', this)" aria-label="Показать/скрыть пароль">👁</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__actions">
+                    <button class="btn" type="submit">Войти</button>
+                    <a class="btn btn--light" th:href="@{/register}">Создать аккаунт</a>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            function togglePwd(id, btn){
+                const i = document.getElementById(id);
+                if(!i) return;
+                const t = i.getAttribute('type') === 'password' ? 'text' : 'password';
+                i.setAttribute('type', t);
+                btn.setAttribute('aria-label', t === 'password' ? 'Показать пароль' : 'Скрыть пароль');
+            }
+        </script>
+    </th:block>
+</th:block>
