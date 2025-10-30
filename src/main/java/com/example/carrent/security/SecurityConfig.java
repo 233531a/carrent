@@ -29,7 +29,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -45,24 +47,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // статика
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/css/**","/js/**","/images/**","/webjars/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 
-                        // публичные страницы
-                        .requestMatchers("/", "/index", "/about", "/cars",
+                        // спец-каталоги (строже правило — выше)
+                        .requestMatchers("/cars/taxi", "/cars/delivery",
+                                "/cars-taxi", "/cars-delivery")
+                        .hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+
+                        // публичные страницы каталога
+                        .requestMatchers(HttpMethod.GET, "/cars", "/cars/").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/cars/*").permitAll() // <-- детали
+                        .requestMatchers("/", "/index", "/about",
                                 "/login", "/register", "/error", "/error/**").permitAll()
 
-                        // каталоги такси/доставки — только для EMPLOYEE, MANAGER, ADMIN
-                        .requestMatchers("/carstaxi", "/cars/delivery",
-                                "/cars-taxi", "/cars-delivery")
-                        .hasAnyRole("EMPLOYEE","MANAGER","ADMIN")
-
-                        // кабинет и бронирования
+                        // личный кабинет/бронирование
                         .requestMatchers("/account/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,  "/booking").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/booking").authenticated()
                         .requestMatchers(HttpMethod.POST, "/booking").authenticated()
 
-                        // менеджер и админ
-                        .requestMatchers("/manager/**").hasAnyRole("MANAGER","ADMIN")
+                        // менеджер/админ
+                        .requestMatchers("/manager/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .anyRequest().denyAll()

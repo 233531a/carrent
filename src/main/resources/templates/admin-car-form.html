@@ -2,8 +2,8 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <div class="page-head">
-            <h2 th:text="${titleForm}">Автомобиль</h2>
+        <div class="page-head" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 class="mt-0" th:text="${titleForm}">Автомобиль</h2>
             <a class="btn btn--light" th:href="@{/admin/cars}">← Назад</a>
         </div>
 
@@ -15,20 +15,22 @@
                 <div>
                     <label>Марка</label>
                     <input th:field="*{make}" required>
-                    <small class="muted" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
+                    <small class="text-muted" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
                 </div>
                 <div>
                     <label>Модель</label>
                     <input th:field="*{model}" required>
-                    <small class="muted" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
+                    <small class="text-muted" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
                 </div>
                 <div>
                     <label>Класс</label>
-                    <input th:field="*{vehicleClass}" placeholder="economy / business / suv" required>
-                    <small class="muted" th:if="${#fields.hasErrors('vehicleClass')}" th:errors="*{vehicleClass}"></small>
+                    <select name="vehicleClass" th:value="${vehicleClass}">
+                        <option>Эконом</option><option>Комфорт</option><option>Бизнес</option>
+                        <option>Паркетник</option><option>Внедорожник</option><option>Премиум</option>
+                    </select>
                 </div>
                 <div>
-                    <label>Коробка</label>
+                    <label>КПП</label>
                     <select th:field="*{transmission}" required>
                         <option value="AT">AT</option>
                         <option value="MT">MT</option>
@@ -42,12 +44,26 @@
                     <label>Цена, ₽/день</label>
                     <input type="number" th:field="*{dailyPrice}" min="1" step="1" required>
                 </div>
+                <div style="align-self:end;">
+                    <label style="display:flex; gap:8px; align-items:center;">
+                        <input type="checkbox" th:field="*{available}"> Доступен
+                    </label>
+                </div>
                 <div>
-                    <label><input type="checkbox" th:field="*{available}"> Доступен</label>
+                    <label>Каталог</label>
+                    <select th:field="*{catalog}" required>
+                        <option th:value="REGULAR">Обычные</option>
+                        <option th:value="TAXI">Такси</option>
+                        <option th:value="DELIVERY">Доставка</option>
+                    </select>
                 </div>
             </div>
 
-            <button class="btn" type="submit">Сохранить</button>
+            <div class="form__actions">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="btn" type="submit">Сохранить</button>
+                <a class="btn btn--light" th:href="@{/admin/cars}">Отмена</a>
+            </div>
         </form>
 
     </th:block>

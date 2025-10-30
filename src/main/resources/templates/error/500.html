@@ -1,10 +1,14 @@
-<!-- 500 -->
-<th:block th:with="title='Ошибка 500', active=''"
+<th:block th:with="title='Внутренняя ошибка', active=''"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <div class="box">
-            <h2>Упс… что-то пошло не так</h2>
-            <p>Мы уже разбираемся. Попробуйте вернуться на <a href="/">главную</a>.</p>
-        </div>
+        <section class="card" style="text-align:center; padding:40px;">
+            <h1 class="mt-0">500 — Внутренняя ошибка сервера</h1>
+            <p class="text-muted">Что-то пошло не так. Если ошибка повторяется — сообщите нам.</p>
+            <p class="text-muted" th:if="${message}"><small th:text="${message}"></small></p>
+            <div class="hero__actions" style="justify-content:center; margin-top:16px;">
+                <a class="btn" th:href="@{/}">На главную</a>
+                <a class="btn btn--light" href="javascript:location.reload()">Повторить</a>
+            </div>
+        </section>
     </th:block>
 </th:block>

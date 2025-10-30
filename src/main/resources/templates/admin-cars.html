@@ -2,38 +2,65 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <div class="page-head">
-            <h2>Автопарк</h2>
+        <div class="page-head" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 class="mt-0">Автопарк</h2>
             <a class="btn" th:href="@{/admin/cars/new}">+ Добавить</a>
         </div>
 
-        <p class="alert alert--ok" th:if="${param.created}">Автомобиль добавлен</p>
-        <p class="alert alert--ok" th:if="${param.updated}">Изменения сохранены</p>
-        <p class="alert alert--ok" th:if="${param.deleted}">Автомобиль удалён</p>
+        <p class="alert" th:if="${param.created}">Автомобиль добавлен</p>
+        <p class="alert" th:if="${param.updated}">Изменения сохранены</p>
+        <p class="alert" th:if="${param.deleted}">Автомобиль удалён</p>
 
-        <div class="card" th:if="${#lists.size(cars)>0}">
-            <table class="table">
+        <div class="card" th:if="${#lists.size(cars) > 0}">
+            <table class="table table-striped table-hover" style="width:100%; text-align:left;">
                 <thead>
                 <tr>
-                    <th>ID</th><th>Марка</th><th>Модель</th><th>Класс</th><th>Коробка</th>
-                    <th>Год</th><th>Цена</th><th>Статус</th><th></th>
+                    <th style="width:60px; text-align:right;">ID</th>
+                    <th>Марка</th>
+                    <th>Модель</th>
+                    <th>Класс</th>
+                    <th style="width:80px;">КПП</th>
+                    <th style="width:80px; text-align:center;">Год</th>
+                    <th style="width:120px; text-align:right;">Цена/день</th>
+                    <th style="width:120px;">Каталог</th>
+                    <th style="width:130px;">Доступность</th>
+                    <th style="width:160px; text-align:center;">Действия</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="c : ${cars}">
-                    <td th:text="${c.id}">1</td>
-                    <td th:text="${c.make}">Make</td>
-                    <td th:text="${c.model}">Model</td>
-                    <td th:text="${c.vehicleClass}">economy</td>
+                    <td style="text-align:right;" th:text="${c.id}">1</td>
+                    <td th:text="${c.make}">Hyundai</td>
+                    <td th:text="${c.model}">Solaris</td>
+                    <td th:text="${c.vehicleClass}">Эконом</td>
                     <td th:text="${c.transmission}">AT</td>
-                    <td th:text="${c.year}">2024</td>
-                    <td th:text="${#numbers.formatDecimal(c.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽'">0 ₽</td>
-                    <td><span class="badge" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
-                              th:classappend="${c.available} ? ' badge--ok' : ' badge--warn'">Статус</span></td>
-                    <td style="white-space:nowrap">
-                        <a class="btn btn--light" th:href="@{|/admin/cars/${c.id}/edit|}">Изм.</a>
+                    <td style="text-align:center;" th:text="${c.year}">2021</td>
+                    <td style="text-align:right; white-space:nowrap;"
+                        th:text="${#numbers.formatDecimal(c.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽'">2 500 ₽</td>
+
+                    <!-- Каталог -->
+                    <td>
+                        <span class="badge"
+                              th:text="${
+                                c.catalog == T(com.example.carrent.model.CatalogType).REGULAR ? 'Обычный' :
+                                (c.catalog == T(com.example.carrent.model.CatalogType).TAXI ? 'Такси' : 'Доставка')
+                              }">Обычный</span>
+                    </td>
+
+                    <!-- Доступность -->
+                    <td>
+                        <span class="badge"
+                              th:classappend="${c.available} ? ' text-bg-success' : ' text-bg-secondary'"
+                              th:text="${c.available} ? 'Доступен' : 'Недоступен'">Доступен</span>
+                    </td>
+
+                    <!-- Действия -->
+                    <td style="text-align:center; white-space:nowrap;">
+                        <a class="btn btn--light btn--sm" th:href="@{|/admin/cars/${c.id}/edit|}">Изм.</a>
                         <form th:action="@{|/admin/cars/${c.id}/delete|}" method="post" style="display:inline">
-                            <button class="btn btn--danger" onclick="return confirm('Удалить авто?')">Удалить</button>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <button class="btn btn--danger btn--sm"
+                                    onclick="return confirm('Удалить автомобиль?')">Удалить</button>
                         </form>
                     </td>
                 </tr>
@@ -41,7 +68,7 @@
             </table>
         </div>
 
-        <p th:if="${#lists.isEmpty(cars)}" class="muted">Пока нет автомобилей.</p>
+        <p th:if="${#lists.isEmpty(cars)}" class="text-muted">Пока нет автомобилей.</p>
 
     </th:block>
 </th:block>

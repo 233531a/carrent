@@ -1,39 +1,157 @@
-<th:block th:with="title='Оформление брони', active='booking'"
+<th:block th:with="title='Бронирование', active='booking'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
+        <div class="card">
+            <h2 class="page-title mt-0">Оформление заявки</h2>
 
-        <h2 class="page-title">Оформление бронирования</h2>
-        <p class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка</p>
+            <p class="alert alert--warn" th:if="${dateError}" th:text="${dateError}">Проверьте даты</p>
 
-        <form class="card form" th:action="@{/booking}" method="post">
-            <div class="form__grid">
-                <div>
-                    <label>Автомобиль</label>
+            <form id="bookingForm" class="form" th:action="@{/booking}" method="post" novalidate>
+                <div class="form__grid">
+                    <div>
+                        <label>Автомобиль</label>
+                        <select id="carId" name="carId" class="form-select" required>
+                            <option value="" disabled th:unless="${selectedCarId != null}" selected>Выберите автомобиль…</option>
+                            <option th:each="c : ${cars}"
+                                    th:value="${c.id}"
+                                    th:selected="${selectedCarId != null} ? (c.id == selectedCarId) : false"
+                                    th:attr="data-price=${c.dailyPrice}"
+                                    th:text="${c.make + ' ' + c.model + ' • ' + c.year}">
+                                Авто
+                            </option>
+                        </select>
+                        <small class="text-muted">Стоимость посуточная — возьмём из выбранного авто.</small>
+                    </div>
 
-                    <input th:if="${car != null}" type="text" th:value="${car.make + ' ' + car.model}" readonly>
-                    <select th:if="${car == null}" name="carId" required>
-                        <option value="" disabled selected>Выберите авто</option>
-                        <option th:each="c : ${cars}" th:value="${c.id}" th:text="${c.make + ' ' + c.model}">car</option>
-                    </select>
-                    <input th:if="${car != null}" type="hidden" name="carId" th:value="${car.id}">
+                    <div>
+                        <label>Дата начала</label>
+                        <input id="startDate" class="form-control" type="date" name="startDate" required>
+                    </div>
+
+                    <div>
+                        <label>Дата окончания</label>
+                        <input id="endDate" class="form-control" type="date" name="endDate" required>
+                    </div>
                 </div>
 
-                <div>
-                    <label>Дата начала</label>
-                    <input type="date" name="startDate" required>
+                <!-- Блок с итогами -->
+                <div class="card" style="margin-top:12px;">
+                    <div class="grid grid--3">
+                        <div><strong>Ставка:</strong> <span id="dailyPrice">—</span></div>
+                        <div><strong>Дней:</strong> <span id="daysCount">0</span></div>
+                        <div><strong>Итого:</strong> <span id="totalPrice">—</span></div>
+                    </div>
+                    <small class="text-muted">Итог считается как (включительно): (конец − начало) + 1 день.</small>
                 </div>
 
-                <div>
-                    <label>Дата окончания</label>
-                    <input type="date" name="endDate" required>
+                <div class="form__actions">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn" type="submit">Отправить заявку</button>
+                    <a class="btn btn--light" th:href="@{/cars}">Вернуться в каталог</a>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="form__actions">
-                <button class="btn" type="submit">Забронировать</button>
-                <a class="btn btn--light" th:href="@{/cars}">Назад к каталогу</a>
-            </div>
-        </form>
+        <script>
+            (function(){
+                const form = document.getElementById('bookingForm');
+                const sel  = document.getElementById('carId');
+                const s    = document.getElementById('startDate');
+                const e    = document.getElementById('endDate');
 
+                const elDaily = document.getElementById('dailyPrice');
+                const elDays  = document.getElementById('daysCount');
+                const elTotal = document.getElementById('totalPrice');
+
+                const fmt = new Intl.NumberFormat('ru-RU');
+
+                // min=today
+                const today = new Date(); today.setHours(0,0,0,0);
+                const toISO = d => d.toISOString().slice(0,10);
+                s.min = e.min = toISO(today);
+
+                function getDailyPrice(){
+                    const opt = sel && sel.options[sel.selectedIndex];
+                    if(!opt) return null;
+                    const raw = opt.getAttribute('data-price');
+                    if(raw == null || raw === '') return null;
+                    const n = Number(raw);
+                    return Number.isFinite(n) ? n : null;
+                }
+
+                function diffDaysInclusive(sd, ed){
+                    const msPerDay = 24*60*60*1000;
+                    const diff = Math.round((ed - sd)/msPerDay);
+                    return diff + 1; // включительно
+                }
+
+                function showMsg(text){
+                    let alert = form.querySelector('.alert.alert--warn.calc');
+                    if(!alert) {
+                        alert = document.createElement('p');
+                        alert.className = 'alert alert--warn calc';
+                        form.insertBefore(alert, form.firstElementChild.nextElementSibling);
+                    }
+                    alert.textContent = text;
+                }
+                function clearMsg(){
+                    const a = form.querySelector('.alert.alert--warn.calc');
+                    if(a) a.remove();
+                }
+
+                function recalc(){
+                    clearMsg();
+
+                    const dp = getDailyPrice();
+                    const sd = s.value ? new Date(s.value) : null;
+                    const ed = e.value ? new Date(e.value) : null;
+                    if(sd) sd.setHours(0,0,0,0);
+                    if(ed) ed.setHours(0,0,0,0);
+
+                    // отрисовать ставку
+                    elDaily.textContent = (dp != null) ? (fmt.format(dp) + ' ₽/день') : '—';
+
+                    // валидация дат
+                    if(sd && sd < today){ showMsg('Дата начала не может быть в прошлом.'); }
+                    if(sd && ed && ed < sd){ showMsg('Дата окончания должна быть позже или равна дате начала.'); }
+
+                    // пересчитать дни/итого
+                    if(dp != null && sd && ed && ed >= sd){
+                        const days = diffDaysInclusive(sd, ed);
+                        const total = dp * days;
+                        elDays.textContent  = String(days);
+                        elTotal.textContent = fmt.format(total) + ' ₽';
+                    } else {
+                        elDays.textContent  = '0';
+                        elTotal.textContent = '—';
+                    }
+                }
+
+                // связать ограничения
+                s.addEventListener('change', ()=>{
+                    e.min = s.value || e.min;
+                    recalc();
+                });
+                e.addEventListener('change', recalc);
+                if(sel) sel.addEventListener('change', recalc);
+
+                // финальная проверка при submit
+                form.addEventListener('submit', (ev)=>{
+                    clearMsg();
+                    const dp = getDailyPrice();
+                    if(!sel || !sel.value){ showMsg('Выберите автомобиль.'); ev.preventDefault(); return; }
+                    const sd = s.value ? new Date(s.value) : null;
+                    const ed = e.value ? new Date(e.value) : null;
+                    if(!sd || !ed){ showMsg('Заполните обе даты.'); ev.preventDefault(); return; }
+                    sd.setHours(0,0,0,0); ed.setHours(0,0,0,0);
+                    if(sd < today){ showMsg('Дата начала не может быть в прошлом.'); ev.preventDefault(); return; }
+                    if(ed < sd){ showMsg('Дата окончания должна быть позже или равна дате начала.'); ev.preventDefault(); return; }
+                    if(dp == null){ showMsg('Для выбранного авто не найдена ставка.'); ev.preventDefault(); return; }
+                });
+
+                // начальный расчёт, если selectedCarId уже выбран на сервере
+                recalc();
+            })();
+        </script>
     </th:block>
 </th:block>

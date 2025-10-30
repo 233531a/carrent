@@ -34,7 +34,7 @@ public class Car {
     @Column(name = "daily_price", precision = 10, scale = 2)
     private BigDecimal dailyPrice;
 
-    private boolean available = true;
+    private boolean available;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -45,7 +45,15 @@ public class Car {
     @PreUpdate
     public void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "catalog", nullable = false)
+    private CatalogType catalog = CatalogType.REGULAR;
+
     // getters/setters
+
+    public CatalogType getCatalog() { return catalog; }
+    public void setCatalog(CatalogType catalog) { this.catalog = catalog; }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

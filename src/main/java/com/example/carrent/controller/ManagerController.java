@@ -70,18 +70,18 @@ public class ManagerController {
     @PostMapping("/rentals/{id}/approve")
     public String approve(@PathVariable Long id) {
         bookingService.approveByManager(id);
-        return "redirect:/manager/rentals?status=PENDING&ok=" + id;
+        return "redirect:/manager/rentals?status=ALL&ok=" + id;
     }
 
     @PostMapping("/rentals/{id}/reject")
     public String reject(@PathVariable Long id) {
         bookingService.rejectByManager(id);
-        return "redirect:/manager/rentals?status=PENDING&rejected=" + id;
+        return "redirect:/manager/rentals?status=ALL&rejected=" + id;
     }
 
     @PostMapping("/rentals/{id}/complete")
     public String complete(@PathVariable Long id) {
         bookingService.completeByManager(id);
-        return "redirect:/manager/rentals?status=ACTIVE&completed=" + id;
+        return "redirect:/manager/rentals?status=ALL&completed=" + id;
     }
 }

@@ -1,41 +1,69 @@
 <th:block th:with="title='Регистрация', active='register'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <div class="auth-card card">
-            <h2 class="page-title">Создать аккаунт</h2>
+        <!-- Полноэкранный бэкдроп -->
+        <div class="auth-backdrop has-spotlight" aria-hidden="true">
+            <span class="spotlight" id="authLightReg"></span>
+        </div>
 
-            <p class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка регистрации</p>
+        <div class="auth-shell">
+            <div class="auth-card">
+                <h2 class="page-title auth-title">Создать аккаунт</h2>
 
-            <form th:action="@{/register}" method="post" class="form form--auth">
-                <div class="form__grid">
-                    <div>
-                        <label>Логин</label>
-                        <input type="text" name="username" placeholder="your.name" minlength="3" maxlength="100" required />
-                    </div>
-                    <div>
-                        <label>Пароль</label>
-                        <div class="input-with-action">
-                            <input id="regPassword" type="password" name="password" placeholder="Минимум 6 символов" minlength="6" required />
-                            <button type="button" class="input-action" onclick="togglePwd('regPassword', this)" aria-label="Показать/скрыть пароль">👁</button>
+                <p class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка регистрации</p>
+
+                <form th:action="@{/register}" method="post" class="form form--auth">
+                    <div class="form__grid">
+                        <div class="field">
+                            <label for="reg_username">Логин</label>
+                            <div class="input-wrap">
+                                <input id="reg_username" type="text" name="username" minlength="3" maxlength="100" required/>
+                            </div>
+                        </div>
+
+                        <div class="field field--password">
+                            <label for="regPassword">Пароль</label>
+                            <div class="input-wrap">
+                                <input id="regPassword" type="password" name="password" minlength="6" required/>
+                                <button type="button" class="input-eye" onclick="togglePwd('regPassword', this)" aria-label="Показать/скрыть пароль">👁</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form__actions">
-                    <button class="btn" type="submit">Зарегистрироваться</button>
-                    <a class="btn btn--light" th:href="@{/login}">У меня уже есть аккаунт</a>
-                </div>
-            </form>
+                    <div class="form__actions">
+                        <button class="btn" type="submit">Зарегистрироваться</button>
+                        <a class="btn btn--light" th:href="@{/login}">У меня уже есть аккаунт</a>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <script>
             function togglePwd(id, btn){
                 const i = document.getElementById(id);
                 if(!i) return;
-                const t = i.getAttribute('type') === 'password' ? 'text' : 'password';
-                i.setAttribute('type', t);
+                const t = i.type === 'password' ? 'text' : 'password';
+                i.type = t;
                 btn.setAttribute('aria-label', t === 'password' ? 'Показать пароль' : 'Скрыть пароль');
             }
+            (function(){
+                const el = document.getElementById('authLightReg');
+                if(!el) return;
+                let tX = 60, tY = 42, cX = tX, cY = tY, ease = 0.06;
+                const loop = () => {
+                    cX += (tX - cX)*ease; cY += (tY - cY)*ease;
+                    el.style.setProperty('--spot-x', cX + '%');
+                    el.style.setProperty('--spot-y', cY + '%');
+                    requestAnimationFrame(loop);
+                };
+                document.addEventListener('mousemove',(e)=>{
+                    const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+                    const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+                    tX = (e.clientX / vw) * 100;
+                    tY = (e.clientY / vh) * 100;
+                });
+                loop();
+            })();
         </script>
     </th:block>
 </th:block>

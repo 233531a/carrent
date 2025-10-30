@@ -2,31 +2,138 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <section class="hero">
+        <!-- HERO -->
+        <section class="hero has-spotlight">
+            <!-- фон: сетка + «фары» + мягкий фонарик + боке-пузыри -->
+            <div class="hero-bg" aria-hidden="true">
+                <span class="orb orb--a"></span>
+                <span class="orb orb--b"></span>
+                <span class="spotlight" id="heroLight" aria-hidden="true"></span>
+
+                <div class="bokeh" aria-hidden="true">
+                    <span style="--i:0;"></span>
+                    <span style="--i:1;"></span>
+                    <span style="--i:2;"></span>
+                    <span style="--i:3;"></span>
+                    <span style="--i:4;"></span>
+                    <span style="--i:5;"></span>
+                    <span style="--i:6;"></span>
+                    <span style="--i:7;"></span>
+                </div>
+            </div>
+
             <div class="hero__content">
-                <h1>Аренда авто — быстро и прозрачно</h1>
-                <p>Выбирайте из десятков предложений и бронируйте в пару кликов.</p>
+                <h1>CarRent — high-tech аренда автомобилей</h1>
+                <p>Быстрый каталог, заявка за минуты и прозрачные статусы:
+                    <strong>Ожидание</strong> → <strong>Активна</strong> → <strong>Завершена</strong>.</p>
+
                 <div class="hero__actions">
-                    <a class="btn" th:href="@{/cars}">Посмотреть автомобили</a>
-                    <a class="btn btn--light" th:href="@{/booking}">Оформить бронь</a>
+                    <a class="btn" th:href="@{/cars}">Каталог</a>
+                    <a class="btn" th:href="@{/booking}">Оформить заявку</a>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">100+ авто в парке</div>
+                    <div class="stat">Одобрение ~15 минут</div>
+                    <div class="stat">Поддержка 24/7</div>
                 </div>
             </div>
         </section>
 
-        <section class="grid grid--3" style="margin-top:16px">
-            <article class="card">
-                <h3>Честные цены</h3>
-                <p>Никаких скрытых платежей — всё видно до оплаты.</p>
-            </article>
-            <article class="card">
-                <h3>Поддержка 24/7</h3>
-                <p>Поможем с выбором и ответим на любые вопросы.</p>
-            </article>
-            <article class="card">
-                <h3>Гибкие условия</h3>
-                <p>Дневная/почасовая аренда, долгосрочно, корпоративно.</p>
-            </article>
+        <!-- Превью ассортимента -->
+        <section class="catalog-preview">
+            <div class="section-head">
+                <h2 class="mt-0">Популярные предложения</h2>
+                <div class="head-actions">
+                    <a class="btn btn--sm" th:href="@{/cars}">Смотреть всё</a>
+                </div>
+            </div>
+
+            <!-- если есть список топ-авто -->
+            <div class="scroller" th:if="${carsTop} != null and ${#lists.size(carsTop)} > 0">
+                <article class="car-card" th:each="car : ${carsTop}">
+                    <a class="car-card__media" th:href="@{'/cars/' + ${car.id}}">
+                        <img th:src="${car.imageUrl} ?: @{/img/car-placeholder.jpg}"
+                             th:alt="${car.brand + ' ' + car.model}" loading="lazy">
+                    </a>
+                    <div class="car-card__body">
+                        <div class="car-card__title" th:text="${car.brand + ' ' + car.model}">Toyota Camry</div>
+                        <div class="car-card__tags">
+                            <span th:text="${car.transmission}">AT</span>
+                            <span th:text="${car.fuelType}">Бензин</span>
+                            <span th:text="${car.className}">D-класс</span>
+                        </div>
+                        <div class="car-card__foot">
+                            <div class="price">
+                                <span th:text="${#numbers.formatDecimal(car.pricePerDay,0,'WHITESPACE',0,'POINT')}"></span>
+                                <span>₽/сутки</span>
+                            </div>
+                            <a class="btn btn--sm" th:href="@{'/cars/' + ${car.id}}">Детали</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- fallback, если carsTop нет -->
+            <div class="grid grid--3" th:if="${carsTop} == null or ${#lists.size(carsTop)} == 0">
+                <a class="card card--link" th:href="@{/cars}">
+                    <h3 class="mt-0">Седаны</h3>
+                    <p class="text-muted">Комфорт и экономичность на каждый день.</p>
+                </a>
+                <a class="card card--link" th:href="@{/cars}">
+                    <h3 class="mt-0">Кроссоверы</h3>
+                    <p class="text-muted">Выше клиренс, свободнее маршруты.</p>
+                </a>
+                <a class="card card--link" th:href="@{/cars}">
+                    <h3 class="mt-0">Для работы</h3>
+                    <p class="text-muted">Надёжные авто для такси и доставки.</p>
+                </a>
+            </div>
         </section>
 
+        <!-- Преимущества -->
+        <section class="features">
+            <div class="grid grid--3">
+                <div class="card">
+                    <h3 class="mt-0">Честные цены</h3>
+                    <p class="text-muted">Все доплаты до бронирования — без сюрпризов.</p>
+                </div>
+                <div class="card">
+                    <h3 class="mt-0">Страховка и помощь</h3>
+                    <p class="text-muted">КАСКО/ОСАГО и круглосуточная поддержка.</p>
+                </div>
+                <div class="card">
+                    <h3 class="mt-0">Гибкие условия</h3>
+                    <p class="text-muted">Посуточно, помесячно — как удобно.</p>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            // Мягкий «фонарик» + медленный дрейф
+            (function(){
+                const el = document.getElementById('heroLight');
+                if(!el) return;
+                let tX = 50, tY = 40, cX = tX, cY = tY, ease = 0.06, drift = 0;
+                const loop = () => {
+                    cX += (tX - cX) * ease; cY += (tY - cY) * ease;
+                    el.style.setProperty('--spot-x', cX + '%');
+                    el.style.setProperty('--spot-y', cY + '%');
+                    requestAnimationFrame(loop);
+                };
+                const driftLoop = () => {
+                    drift += 0.0025;
+                    tX = 50 + Math.sin(drift) * 20;
+                    tY = 45 + Math.cos(drift * 0.8) * 16;
+                    requestAnimationFrame(driftLoop);
+                };
+                document.querySelector('.hero')?.addEventListener('mousemove', (e)=>{
+                    const r = e.currentTarget.getBoundingClientRect();
+                    tX = ((e.clientX - r.left)/r.width)*100;
+                    tY = ((e.clientY - r.top)/r.height)*100;
+                });
+                loop(); driftLoop();
+            })();
+        </script>
     </th:block>
 </th:block>

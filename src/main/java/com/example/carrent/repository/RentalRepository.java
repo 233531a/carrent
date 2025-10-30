@@ -8,10 +8,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface RentalRepository extends JpaRepository<Rental, Long> {
+
+    boolean existsByCar_IdAndStatusIn(Long carId, Collection<RentalStatus> statuses);
 
     // История броней клиента
     List<Rental> findByCustomerIdOrderByCreatedAtDesc(Long customerId);

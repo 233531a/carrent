@@ -46,4 +46,10 @@ public class AccountController {
         bookingService.cancel(me.getUsername(), id);
         return "redirect:/account?cancelled=" + id;
     }
+
+    @PostMapping("/account/rentals/{id}/complete")
+    public String complete(@AuthenticationPrincipal UserDetails me, @PathVariable Long id) {
+        bookingService.completeByCustomer(me.getUsername(), id);
+        return "redirect:/account?completed=" + id;
+    }
 }

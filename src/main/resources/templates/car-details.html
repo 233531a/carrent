@@ -1,30 +1,30 @@
-<th:block th:with="title=${car.make} + ' ' + ${car.model}, active='cars'"
+<th:block th:with="title=${car.make + ' ' + car.model}, active='cars'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <nav class="crumbs">
-            <a th:href="@{/cars}">Каталог</a>
-            <span>›</span>
-            <span th:text="${car.make} + ' ' + ${car.model}">Авто</span>
+        <nav class="crumbs" style="margin-bottom:12px;">
+            <a th:href="@{/cars}">Каталог</a><span>›</span>
+            <span th:text="${car.make + ' ' + car.model}">Авто</span>
         </nav>
 
-        <div class="card card--wide">
-            <h2 th:text="${car.make} + ' ' + ${car.model}">Название</h2>
-            <div class="grid-2">
+        <div class="card">
+            <h2 class="mt-0" th:text="${car.make + ' ' + car.model}">Название</h2>
+
+            <div class="grid grid--2">
+                <ul class="spec" style="margin:0; padding-left:18px;">
+                    <li><strong>Класс:</strong> <span th:text="${car.vehicleClass}">economy</span></li>
+                    <li><strong>КПП:</strong> <span th:text="${car.transmission}">AT</span></li>
+                    <li><strong>Год:</strong> <span th:text="${car.year}">2024</span></li>
+                </ul>
+
                 <div>
-                    <ul class="spec">
-                        <li><strong>Класс:</strong> <span th:text="${car.vehicleClass}">economy</span></li>
-                        <li><strong>Коробка:</strong> <span th:text="${car.transmission}">AT</span></li>
-                        <li><strong>Год:</strong> <span th:text="${car.year}">2024</span></li>
-                    </ul>
-                </div>
-                <div class="price-box">
-                    <div class="price" th:text="${#numbers.formatDecimal(car.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽/день'">0 ₽/день</div>
-                    <div class="status">
-            <span class="badge" th:text="${car.available} ? 'Доступен' : 'Недоступен'"
-                  th:classappend="${car.available} ? ' badge--ok' : ' badge--warn'">Статус</span>
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(car.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽/день'">0 ₽/день</div>
+                    <div style="margin:10px 0;">
+                        <span class="badge" th:text="${car.available} ? 'Доступен' : 'Недоступен'"
+                              th:classappend="${car.available} ? ' text-bg-success' : ' text-bg-secondary'">Статус</span>
                     </div>
-                    <div class="actions">
+                    <div class="hero__actions">
                         <a class="btn" th:if="${car.available}" th:href="@{|/booking?carId=${car.id}|}">Арендовать</a>
                         <a class="btn btn--light" th:href="@{/cars}">Назад</a>
                     </div>
@@ -34,3 +34,4 @@
 
     </th:block>
 </th:block>
+

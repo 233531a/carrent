@@ -4,181 +4,145 @@ import com.example.carrent.model.Car;
 import com.example.carrent.model.Customer;
 import com.example.carrent.model.Rental;
 import com.example.carrent.model.RentalStatus;
+import com.example.carrent.model.User;
 import com.example.carrent.repository.CarRepository;
 import com.example.carrent.repository.CustomerRepository;
 import com.example.carrent.repository.RentalRepository;
-import jakarta.transaction.Transactional;
+import com.example.carrent.repository.UserRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.EnumSet;
+import java.util.Set;
 
 @Service
 public class BookingService {
 
+    private static final Set<RentalStatus> HOLDS_AVAILABILITY =
+            EnumSet.of(RentalStatus.PENDING, RentalStatus.ACTIVE);
+
     private final RentalRepository rentalRepo;
     private final CarRepository carRepo;
+    private final UserRepository userRepo;
     private final CustomerRepository customerRepo;
 
-    public BookingService(RentalRepository rentalRepo, CarRepository carRepo, CustomerRepository customerRepo) {
+    public BookingService(RentalRepository rentalRepo,
+                          CarRepository carRepo,
+                          UserRepository userRepo,
+                          CustomerRepository customerRepo) {
         this.rentalRepo = rentalRepo;
         this.carRepo = carRepo;
+        this.userRepo = userRepo;
         this.customerRepo = customerRepo;
     }
 
-    /**
-     * Бронирование по username (principal.getUsername()).
-     */
+    /** Пользователь подаёт заявку (PENDING) — авто сразу скрываем (available=false). */
     @Transactional
-    public Rental book(String username, Long carId, LocalDate start, LocalDate end) {
-        if (start == null || end == null || end.isBefore(start)) {
-            throw new IllegalArgumentException("Некорректные даты брони");
-        }
-
-        Customer customer = customerRepo.findByUser_Username(username)
-                .orElseThrow(() -> new IllegalStateException("Клиентская карточка не найдена"));
-
+    public Rental book(String username, Long carId, LocalDate startDate, LocalDate endDate) {
+        User user = userRepo.findByUsername(username).orElseThrow();
+        Customer customer = customerRepo.findByUser_Id(user.getId())
+                .orElseGet(() -> {
+                    Customer c = new Customer();
+                    c.setUser(user);
+                    return customerRepo.save(c);
+                });
         Car car = carRepo.findById(carId).orElseThrow();
 
-        // Пересечения по датам
-        if (rentalRepo.hasOverlap(carId, start, end)) {
-            throw new IllegalStateException("На выбранные даты авто уже забронировано");
+        // Не даём бронировать уже скрытую/занятую машину
+        if (!car.isAvailable()) {
+            throw new IllegalStateException("Автомобиль уже недоступен для бронирования");
         }
-
-        long days = ChronoUnit.DAYS.between(start, end) + 1;
-        if (days <= 0) throw new IllegalArgumentException("Минимум 1 день");
-
-        BigDecimal pricePerDay = car.getDailyPrice();
-        BigDecimal total = pricePerDay.multiply(BigDecimal.valueOf(days));
 
         Rental r = new Rental();
         r.setCar(car);
         r.setCustomer(customer);
-        r.setStartDate(start);
-        r.setEndDate(end);
-        r.setStatus(RentalStatus.PENDING);   // ждёт решения менеджера
-        r.setDaysCount((int) days);
-        r.setPricePerDay(pricePerDay);
-        r.setTotalAmount(total);
+        r.setStartDate(startDate);
+        r.setEndDate(endDate);
+        r.setStatus(RentalStatus.PENDING);
 
+        // Сохраняем заявку
         r = rentalRepo.save(r);
 
-        // делаем авто недоступным при появлении ожидающей/активной брони
-        blockCarIfNeeded(car);
+        // Сразу скрываем карточку
+        car.setAvailable(false);
+        carRepo.save(car);
 
         return r;
     }
 
-    /**
-     * Отмена брони пользователем (защита от отмены чужой брони).
-     */
+    /** Отмена доступна только для заявок (PENDING) и только владельцу. */
     @Transactional
     public void cancel(String username, Long rentalId) {
         Rental r = rentalRepo.findById(rentalId).orElseThrow();
-
-        String ownerUsername = r.getCustomer().getUser().getUsername();
-        if (ownerUsername == null || !ownerUsername.equals(username)) {
-            throw new SecurityException("Нельзя отменить чужую бронь");
+        String owner = r.getCustomer().getUser().getUsername();
+        if (!owner.equals(username)) {
+            throw new AccessDeniedException("Нельзя отменить чужую заявку");
         }
-
-        if (r.getStatus() == RentalStatus.CANCELLED || r.getStatus() == RentalStatus.COMPLETED) {
-            return;
+        if (r.getStatus() != RentalStatus.PENDING) {
+            throw new IllegalStateException("Отменять можно только заявки в статусе «Ожидание»");
         }
-
         r.setStatus(RentalStatus.CANCELLED);
-        rentalRepo.save(r);
 
-        freeCarIfNoActiveOrPending(r.getCar());
+        // Проверяем, можно ли снова показывать карточку
+        updateCarAvailabilityIfFree(r.getCar());
     }
 
-    // ---------------------------
-    // Методы для менеджера/админа
-    // ---------------------------
-
-    /**
-     * Одобрить бронь -> переводим в ACTIVE.
-     */
+    /** Менеджер одобряет только PENDING -> ACTIVE (машина уже скрыта; ничего не меняем). */
     @Transactional
     public void approveByManager(Long rentalId) {
-        Rental r = rentalRepo.findById(rentalId)
-                .orElseThrow(() -> new NoSuchElementException("Бронь не найдена: " + rentalId));
-
-        if (r.getStatus() == RentalStatus.CANCELLED || r.getStatus() == RentalStatus.COMPLETED) {
-            return; // ничего не делаем для финальных статусов
-        }
-
-        // На всякий случай: при одобрении удостоверимся, что авто заблокировано
+        var r = rentalRepo.findById(rentalId).orElseThrow();
+        if (r.getStatus() != RentalStatus.PENDING)
+            throw new IllegalStateException("Одобрять можно только PENDING");
         r.setStatus(RentalStatus.ACTIVE);
-        rentalRepo.save(r);
-        blockCarIfNeeded(r.getCar());
+        // car уже hidden; без действий
     }
 
-    /**
-     * Отклонить бронь -> REJECTED.
-     */
+    /** Менеджер отклоняет только PENDING -> REJECTED. */
     @Transactional
     public void rejectByManager(Long rentalId) {
-        Rental r = rentalRepo.findById(rentalId)
-                .orElseThrow(() -> new NoSuchElementException("Бронь не найдена: " + rentalId));
-
-        if (r.getStatus() == RentalStatus.CANCELLED || r.getStatus() == RentalStatus.COMPLETED) {
-            return;
+        Rental r = rentalRepo.findById(rentalId).orElseThrow();
+        if (r.getStatus() != RentalStatus.PENDING) {
+            throw new IllegalStateException("Отклонять можно только заявки в статусе «Ожидание»");
         }
-
         r.setStatus(RentalStatus.REJECTED);
-        rentalRepo.save(r);
 
-        freeCarIfNoActiveOrPending(r.getCar());
+        updateCarAvailabilityIfFree(r.getCar());
     }
 
-    /**
-     * Завершить аренду -> COMPLETED.
-     */
+    /** Менеджер завершает только ACTIVE -> COMPLETED. */
     @Transactional
     public void completeByManager(Long rentalId) {
-        Rental r = rentalRepo.findById(rentalId)
-                .orElseThrow(() -> new NoSuchElementException("Бронь не найдена: " + rentalId));
-
-        if (r.getStatus() == RentalStatus.CANCELLED || r.getStatus() == RentalStatus.COMPLETED) {
-            return;
+        Rental r = rentalRepo.findById(rentalId).orElseThrow();
+        if (r.getStatus() != RentalStatus.ACTIVE) {
+            throw new IllegalStateException("Завершать можно только активные аренды");
         }
-
         r.setStatus(RentalStatus.COMPLETED);
-        rentalRepo.save(r);
 
-        freeCarIfNoActiveOrPending(r.getCar());
+        updateCarAvailabilityIfFree(r.getCar());
     }
 
-    // ---------------------------
-    // Вспомогательные методы
-    // ---------------------------
-
-    private void blockCarIfNeeded(Car car) {
-        if (car == null) return;
-        if (!car.isAvailable()) return;
-
-        // если у авто есть PENDING/ACTIVE — держим его недоступным
-        boolean blocked = rentalRepo.countByCarIdAndStatusIn(
-                car.getId(), List.of(RentalStatus.PENDING, RentalStatus.ACTIVE)
-        ) > 0;
-
-        if (blocked) {
-            car.setAvailable(false);
-            carRepo.save(car);
+    /** Клиент завершает только свою ACTIVE -> COMPLETED. */
+    @Transactional
+    public void completeByCustomer(String username, Long rentalId) {
+        Rental r = rentalRepo.findById(rentalId).orElseThrow();
+        String owner = r.getCustomer().getUser().getUsername();
+        if (!owner.equals(username)) {
+            throw new AccessDeniedException("Нельзя завершить чужую аренду");
         }
+        if (r.getStatus() != RentalStatus.ACTIVE) {
+            throw new IllegalStateException("Завершать можно только активные аренды");
+        }
+        r.setStatus(RentalStatus.COMPLETED);
+
+        updateCarAvailabilityIfFree(r.getCar());
     }
 
-    private void freeCarIfNoActiveOrPending(Car car) {
-        if (car == null) return;
-
-        boolean stillBlocked = rentalRepo.countByCarIdAndStatusIn(
-                car.getId(), List.of(RentalStatus.PENDING, RentalStatus.ACTIVE)
-        ) > 0;
-
-        if (!stillBlocked && !car.isAvailable()) {
+    /** Если по машине больше нет заявок/активных — делаем её видимой. */
+    private void updateCarAvailabilityIfFree(Car car) {
+        boolean stillHeld = rentalRepo.existsByCar_IdAndStatusIn(car.getId(), HOLDS_AVAILABILITY);
+        if (!stillHeld) {
             car.setAvailable(true);
             carRepo.save(car);
         }

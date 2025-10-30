@@ -1,10 +1,55 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body th:replace="~{'layout' :: layout(${title}, 'cars', ~{::section})}">
-<section>
-    <h1 class="page-title">Спецпредложения для такси</h1>
-    <div class="alert">Доступно только для сотрудников с ролью WORKER (ROLE_EMPLOYEE).</div>
-    <div class="empty">Здесь будет список автомобилей для такси.</div>
-</section>
-</body>
-</html>
+<th:block th:with="title='Спецпредложения — Такси', active='cars'"
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}"
+          xmlns:th="http://www.thymeleaf.org">
+
+    <th:block th:fragment="content">
+
+        <h2 class="page-title">Спецпредложения для такси</h2>
+        <p class="text-muted" style="margin-top:-8px;">Доступно для сотрудников с ролью EMPLOYEE/MANAGER/ADMIN.</p>
+
+        <form class="card form" method="get" th:action="@{/cars/taxi}">
+            <div class="form__grid">
+                <div>
+                    <label>Сортировка</label>
+                    <select name="sort" th:value="${sort}" onchange="this.form.submit()">
+                        <option th:value="${null}" th:selected="${sort==null}">Без сортировки</option>
+                        <option value="price_asc"  th:selected="${sort=='price_asc'}">Цена ↑</option>
+                        <option value="price_desc" th:selected="${sort=='price_desc'}">Цена ↓</option>
+                        <option value="make"       th:selected="${sort=='make'}">Марка A→Z</option>
+                        <option value="newest"     th:selected="${sort=='newest'}">Год (новые)</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
+            <article class="card car" th:each="c : ${cars}">
+                <div class="car__head">
+                    <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
+                    <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
+                          th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
+                </div>
+
+                <p class="text-muted">
+                    <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
+                    <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
+                    <span th:text="'Год: ' + ${c.year}">Year</span>
+                </p>
+
+                <div class="car__price" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
+
+                    <div class="hero__actions" style="margin-top:8px;">
+                        <a class="btn btn--sm" th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="empty" th:if="${#lists.size(cars) == 0}">
+            <p>Пока подходящих авто для «Такси» нет.</p>
+        </div>
+
+    </th:block>
+</th:block>

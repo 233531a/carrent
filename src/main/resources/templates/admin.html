@@ -1,59 +1,24 @@
-<th:block th:with="title='Администрирование', active='admin'"
+<th:block th:with="title='Админ-панель', active='admin'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
-    <th:block th:fragment="content" sec:authorize="hasRole('ADMIN')">
+    <th:block th:fragment="content">
 
-        <div class="page-head">
-            <h2>Панель администратора</h2>
+        <h2 class="page-title">Администрирование</h2>
 
-            <div class="actions" style="display:flex; gap:.5rem; flex-wrap:wrap">
-                <a class="btn" th:href="@{/admin/cars}">🚗 Управление машинами</a>
-                <a class="btn btn--light" th:href="@{/admin/users}">👤 Управление пользователями</a>
-            </div>
-
-            <div class="chips" style="margin-top:.75rem">
-                <span class="chip">Авто: <b th:text="${carsCount}">0</b></span>
-                <span class="chip">Пользователи: <b th:text="${usersCount}">0</b></span>
-                <span class="chip">Брони: <b th:text="${rentalsCount}">0</b></span>
-            </div>
+        <div class="grid grid--3 admin-tiles">
+            <a class="card card--link" th:href="@{/admin/users}">
+                <h3 class="mt-0">Пользователи</h3>
+                <p class="text-muted">Роли, активность, доступ.</p>
+            </a>
+            <a class="card card--link" th:href="@{/admin/cars}">
+                <h3 class="mt-0">Автопарк</h3>
+                <p class="text-muted">Добавление и редактирование автомобилей.</p>
+            </a>
+            <a class="card card--link" th:href="@{/manager/rentals}">
+                <h3 class="mt-0">Заявки/Аренды</h3>
+                <p class="text-muted">Просмотр и управление статусами.</p>
+            </a>
         </div>
 
-        <div class="grid-2">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
-                    <h3>Автомобили</h3>
-                    <a class="btn btn--light" th:href="@{/admin/cars}">Перейти →</a>
-                </div>
-                <table class="table">
-                    <thead><tr><th>#</th><th>Модель</th><th>Доступность</th><th>₽/день</th></tr></thead>
-                    <tbody>
-                    <tr th:each="c : ${cars}">
-                        <td th:text="${c.id}">1</td>
-                        <td th:text="${c.make + ' ' + c.model}">Model</td>
-                        <td th:text="${c.available ? 'Да' : 'Нет'}">Да</td>
-                        <td th:text="${#numbers.formatInteger(c.dailyPrice, 0)}">2500</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
 
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
-                    <h3>Последние бронирования</h3>
-                    <a class="btn btn--light" th:href="@{/manager}">К бронированиям →</a>
-                </div>
-                <table class="table">
-                    <thead><tr><th>#</th><th>Клиент</th><th>Авто</th><th>Даты</th><th>Статус</th></tr></thead>
-                    <tbody>
-                    <tr th:each="r : ${recentRentals}">
-                        <td th:text="${r.id}">1</td>
-                        <td th:text="${r.customer.fullName}">Имя</td>
-                        <td th:text="${r.car.make + ' ' + r.car.model}">Авто</td>
-                        <td th:text="${#temporals.format(r.startDate,'dd.MM')} + '–' + ${#temporals.format(r.endDate,'dd.MM')}">12–14</td>
-                        <td><span class="badge" th:text="${r.status}">PENDING</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </th:block>
 </th:block>

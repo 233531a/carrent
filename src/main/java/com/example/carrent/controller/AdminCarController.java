@@ -73,6 +73,8 @@ public class AdminCarController {
         car.setTransmission(form.getTransmission());
         car.setAvailable(form.isAvailable());
         car.setDailyPrice(form.getDailyPrice() == null ? BigDecimal.ZERO : form.getDailyPrice());
+        car.setCatalog(form.getCatalog());
+
 
         carRepo.save(car);
         return "redirect:/admin/cars?updated";

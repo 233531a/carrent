@@ -38,7 +38,25 @@ public class BookingController {
     public String makeBooking(@AuthenticationPrincipal UserDetails principal,
                               @RequestParam Long carId,
                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                              Model model) {
+
+        // server-side защита на случай отключённого JS
+        LocalDate today = LocalDate.now();
+        if (startDate == null || endDate == null
+                || startDate.isBefore(today)
+                || endDate.isBefore(startDate)) {
+            List<Car> cars = carRepo.findAll();
+            model.addAttribute("cars", cars);
+            model.addAttribute("selectedCarId", carId);
+            String err = (startDate == null || endDate == null)
+                    ? "Заполните обе даты."
+                    : startDate.isBefore(today)
+                    ? "Дата начала не может быть в прошлом."
+                    : "Дата окончания должна быть позже даты начала.";
+            model.addAttribute("dateError", err);
+            return "booking";
+        }
 
         bookingService.book(principal.getUsername(), carId, startDate, endDate);
         return "redirect:/account";

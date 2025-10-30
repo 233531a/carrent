@@ -11,6 +11,7 @@ public class PageController {
         return "about";
     }
 
+    @GetMapping("/cars-taxi")
     public String taxi() {
         return "cars-taxi";
     }

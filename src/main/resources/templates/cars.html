@@ -1,18 +1,17 @@
 <th:block th:with="title='Автомобили', active='cars'"
-          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
+          th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}"
+          xmlns:sec="http://www.w3.org/1999/xhtml">
     <th:block th:fragment="content">
 
         <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom:16px;">
-            <span class="chip" th:text="${mode == 'taxi' ? 'Спец-предложения для такси' :
-                                         (mode == 'delivery' ? 'Спец-предложения для доставки' : mode)}">Режим</span>
-            <p class="car__meta" style="margin-top:8px;">
-                Здесь показываются автомобили, подходящие под выбранное направление.
-            </p>
+      <span class="chip" th:text="${mode == 'taxi' ? 'Спец-подборка для такси' :
+                                   (mode == 'delivery' ? 'Спец-подборка для доставки' : mode)}">Режим</span>
+            <p class="text-muted" style="margin-top:8px;">Здесь показываются автомобили для выбранного направления.</p>
         </div>
 
         <h2 class="page-title">Каталог автомобилей</h2>
 
-        <!-- Фильтры показываем только в обычном каталоге -->
+        <!-- Фильтры для обычного каталога -->
         <form class="card form form--filters"
               th:action="@{/cars}" method="get"
               th:if="${mode == null or mode == 'regular'}">
@@ -25,30 +24,52 @@
                     <label>Класс</label>
                     <select name="vehicleClass" th:value="${vehicleClass}">
                         <option value="">Любой</option>
-                        <option>economy</option>
-                        <option>compact</option>
-                        <option>midsize</option>
-                        <option>fullsize</option>
-                        <option>suv</option>
-                        <option>premium</option>
+                        <option>Эконом</option><option>Комфорт</option><option>Бизнес</option>
+                        <option>Паркетник</option><option>Внедорожник</option><option>Премиум</option>
                     </select>
                 </div>
                 <div>
                     <label>КПП</label>
                     <select name="transmission" th:value="${transmission}">
-                        <option value="">Любая</option>
-                        <option>automatic</option>
-                        <option>manual</option>
+                        <option value="">Любая</option><option>AT</option><option>MT</option>
                     </select>
                 </div>
                 <div>
                     <label>Цена до, ₽/день</label>
                     <input type="number" name="maxPrice" step="100" th:value="${maxPrice}">
                 </div>
+                <div>
+                    <label>Сортировка</label>
+                    <select name="sort" th:value="${sort}">
+                        <option th:value="${null}" th:selected="${sort==null}">Без сортировки</option>
+                        <option value="price_asc"  th:selected="${sort=='price_asc'}">Цена ↑</option>
+                        <option value="price_desc" th:selected="${sort=='price_desc'}">Цена ↓</option>
+                        <option value="make"       th:selected="${sort=='make'}">Марка A→Z</option>
+                        <option value="newest"     th:selected="${sort=='newest'}">Год (новые)</option>
+                    </select>
+                </div>
             </div>
             <div class="form__actions">
                 <button class="btn" type="submit">Фильтровать</button>
                 <a class="btn btn--light" th:href="@{/cars}">Сбросить</a>
+            </div>
+        </form>
+
+        <!-- Для режимов — только сортировка -->
+        <form class="card form" method="get"
+              th:if="${mode != null and mode != 'regular'}"
+              th:action="@{${#httpServletRequest.requestURI}}">
+            <div class="form__grid">
+                <div>
+                    <label>Сортировка</label>
+                    <select name="sort" th:value="${sort}" onchange="this.form.submit()">
+                        <option th:value="${null}" th:selected="${sort==null}">Без сортировки</option>
+                        <option value="price_asc"  th:selected="${sort=='price_asc'}">Цена ↑</option>
+                        <option value="price_desc" th:selected="${sort=='price_desc'}">Цена ↓</option>
+                        <option value="make"       th:selected="${sort=='make'}">Марка A→Z</option>
+                        <option value="newest"     th:selected="${sort=='newest'}">Год (новые)</option>
+                    </select>
+                </div>
             </div>
         </form>
 
@@ -59,23 +80,23 @@
                     <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
                           th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
                 </div>
-                <p class="car__meta">
+
+                <p class="text-muted">
                     <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
                     <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
                     <span th:text="'Год: ' + ${c.year}">Year</span>
                 </p>
 
-                <div class="car__price">
-                    <div>
-                        <div class="price"
-                             th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
-                        <div th:if="${mode != null && mode != 'regular'}"
-                             class="text-muted" style="color:#a7b0c0; font-size:13px; margin-top:4px;">
-                            Спец-тариф: условия уточняются при оформлении
-                        </div>
+                <div class="car__price" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div class="price"
+                         th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
+
+                    <!-- ↓↓↓ ДОБАВЛЕНО: кнопка «Подробнее» -->
+                    <div class="hero__actions" style="margin-top:8px;">
+                        <a class="btn btn--sm"
+                           th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
                     </div>
 
-                    <!-- Кнопка брони -->
                     <a class="btn" th:href="@{/booking(carId=${c.id})}" sec:authorize="isAuthenticated()">Забронировать</a>
                     <a class="btn btn--light" th:href="@{/login(from='booking')}" sec:authorize="isAnonymous()">Забронировать</a>
                 </div>
@@ -83,7 +104,7 @@
         </div>
 
         <div class="empty" th:if="${#lists.size(cars) == 0}">
-            <p>Ничего не найдено. Попробуйте изменить фильтры.</p>
+            <p>Ничего не найдено. Измените фильтры.</p>
         </div>
 
     </th:block>
