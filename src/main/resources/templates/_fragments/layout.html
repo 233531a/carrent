@@ -8,10 +8,12 @@
     <meta name="color-scheme" content="dark light"/>
     <title th:text="${title} ?: 'CarRent'">CarRent</title>
 
+    <!-- Fonts & Styles -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
 
+    <!-- Persisted theme -->
     <script>
         (function () {
             const saved = localStorage.getItem('theme');
@@ -85,6 +87,13 @@
             <a sec:authorize="hasRole('MANAGER') and !hasRole('ADMIN')" th:href="@{/manager}">Менеджер</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Управление</a>
         </nav>
+    </div>
+    <!-- Дополнительная информация и ссылки -->
+    <div class="container footer-info">
+        <span>CarRent • Все права защищены</span>
+        <a th:href="@{/terms}">Правила бронирования</a>
+        <a th:href="@{/privacy}">Политика конфиденциальности</a>
+        <a th:href="@{/contacts}">Контакты</a>
     </div>
 </footer>
 

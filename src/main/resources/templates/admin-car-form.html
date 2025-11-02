@@ -12,23 +12,34 @@
               method="post">
 
             <div class="form__grid">
+                <!-- Марка -->
                 <div>
                     <label>Марка</label>
                     <input th:field="*{make}" required>
                     <small class="text-muted" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
                 </div>
+
+                <!-- Модель -->
                 <div>
                     <label>Модель</label>
                     <input th:field="*{model}" required>
                     <small class="text-muted" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
                 </div>
+
+                <!-- Класс (строка) -->
                 <div>
                     <label>Класс</label>
-                    <select name="vehicleClass" th:value="${vehicleClass}">
-                        <option>Эконом</option><option>Комфорт</option><option>Бизнес</option>
-                        <option>Паркетник</option><option>Внедорожник</option><option>Премиум</option>
+                    <select th:field="*{vehicleClass}" required>
+                        <option th:value="'Эконом'">Эконом</option>
+                        <option th:value="'Комфорт'">Комфорт</option>
+                        <option th:value="'Бизнес'">Бизнес</option>
+                        <option th:value="'Паркетник'">Паркетник</option>
+                        <option th:value="'Внедорожник'">Внедорожник</option>
+                        <option th:value="'Премиум'">Премиум</option>
                     </select>
                 </div>
+
+                <!-- КПП (AT/MT) -->
                 <div>
                     <label>КПП</label>
                     <select th:field="*{transmission}" required>
@@ -36,26 +47,41 @@
                         <option value="MT">MT</option>
                     </select>
                 </div>
+
+                <!-- Год -->
                 <div>
                     <label>Год</label>
                     <input type="number" th:field="*{year}" min="1980" max="2100" required>
                 </div>
+
+                <!-- Цена -->
                 <div>
                     <label>Цена, ₽/день</label>
                     <input type="number" th:field="*{dailyPrice}" min="1" step="1" required>
                 </div>
+
+                <!-- Доступность -->
                 <div style="align-self:end;">
                     <label style="display:flex; gap:8px; align-items:center;">
                         <input type="checkbox" th:field="*{available}"> Доступен
                     </label>
                 </div>
+
+                <!-- Каталог (enum/строка) -->
                 <div>
                     <label>Каталог</label>
                     <select th:field="*{catalog}" required>
-                        <option th:value="REGULAR">Обычные</option>
-                        <option th:value="TAXI">Такси</option>
-                        <option th:value="DELIVERY">Доставка</option>
+                        <option value="REGULAR">Обычный</option>
+                        <option value="TAXI">Такси</option>
+                        <option value="DELIVER">Доставка</option>
                     </select>
+                </div>
+
+                <!-- Фото (URL) -->
+                <div>
+                    <label>Фото (URL)</label>
+                    <input th:field="*{photoUrl}" placeholder="/images/camry.png">
+                    <small class="text-muted">Положите файл в <code>static/images</code> и укажите путь вида <code>/images/имяфайла.png</code>.</small>
                 </div>
             </div>
 

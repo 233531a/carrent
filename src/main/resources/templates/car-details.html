@@ -7,8 +7,31 @@
             <span th:text="${car.make + ' ' + car.model}">Авто</span>
         </nav>
 
-        <div class="card">
+        <div class="card car-details">
+            <div class="img-skel shimmer big">
+                <img
+                        th:src="${car != null and car.photoUrl != null and !#strings.isEmpty(car.photoUrl) ?
+              ((car.photoUrl.startsWith('http') or car.photoUrl.startsWith('/'))
+                  ? car.photoUrl
+                  : '/images/' + car.photoUrl)
+             : '/images/placeholder-car.jpg'}"
+                        alt=""
+                        onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+            </div>
+
+
             <h2 class="mt-0" th:text="${car.make + ' ' + car.model}">Название</h2>
+
+            <!-- Каталог (локализованный статус) + доступность -->
+            <div style="display:flex; gap:8px; align-items:center; margin:6px 0 14px;">
+                <span class="chip"
+                      th:text="${car.catalog == 'REGULAR' ? 'Обычный' : (car.catalog == 'TAXI' ? 'Такси' : (car.catalog == 'DELIVER' ? 'Доставка' : car.catalog))}">
+                    Обычный
+                </span>
+                <span class="badge"
+                      th:text="${car.available} ? 'Доступен' : 'Недоступен'"
+                      th:classappend="${car.available} ? ' text-bg-success' : ' text-bg-secondary'">Статус</span>
+            </div>
 
             <div class="grid grid--2">
                 <ul class="spec" style="margin:0; padding-left:18px;">
@@ -20,11 +43,7 @@
                 <div>
                     <div class="price"
                          th:text="${#numbers.formatDecimal(car.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽/день'">0 ₽/день</div>
-                    <div style="margin:10px 0;">
-                        <span class="badge" th:text="${car.available} ? 'Доступен' : 'Недоступен'"
-                              th:classappend="${car.available} ? ' text-bg-success' : ' text-bg-secondary'">Статус</span>
-                    </div>
-                    <div class="hero__actions">
+                    <div class="hero__actions" style="margin-top:10px;">
                         <a class="btn" th:if="${car.available}" th:href="@{|/booking?carId=${car.id}|}">Арендовать</a>
                         <a class="btn btn--light" th:href="@{/cars}">Назад</a>
                     </div>
@@ -34,4 +53,3 @@
 
     </th:block>
 </th:block>
-

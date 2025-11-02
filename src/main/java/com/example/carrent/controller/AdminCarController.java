@@ -74,6 +74,7 @@ public class AdminCarController {
         car.setAvailable(form.isAvailable());
         car.setDailyPrice(form.getDailyPrice() == null ? BigDecimal.ZERO : form.getDailyPrice());
         car.setCatalog(form.getCatalog());
+        car.setPhotoUrl(form.getPhotoUrl());
 
 
         carRepo.save(car);

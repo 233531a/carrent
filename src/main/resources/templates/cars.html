@@ -3,18 +3,23 @@
           xmlns:sec="http://www.w3.org/1999/xhtml">
     <th:block th:fragment="content">
 
+        <!-- Инфо-блок для режимов -->
         <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom:16px;">
-      <span class="chip" th:text="${mode == 'taxi' ? 'Спец-подборка для такси' :
-                                   (mode == 'delivery' ? 'Спец-подборка для доставки' : mode)}">Режим</span>
+            <span class="chip"
+                  th:text="${mode == 'taxi' ? 'Спец-подборка для такси'
+                                 : (mode == 'delivery' ? 'Спец-подборка для доставки' : mode)}">Режим</span>
             <p class="text-muted" style="margin-top:8px;">Здесь показываются автомобили для выбранного направления.</p>
         </div>
 
         <h2 class="page-title">Каталог автомобилей</h2>
 
-        <!-- Фильтры для обычного каталога -->
-        <form class="card form form--filters"
-              th:action="@{/cars}" method="get"
+        <!-- Фильтры: обычный режим -->
+        <form class="card form form--filters filters-v2" th:action="@{/cars}" method="get"
               th:if="${mode == null or mode == 'regular'}">
+            <div class="filters-v2__bar">
+                <button class="btn btn--sm" type="submit">Фильтр</button>
+                <a class="btn btn--sm btn--light" th:href="@{/cars}">Сброс</a>
+            </div>
             <div class="form__grid">
                 <div>
                     <label>Марка/Модель</label>
@@ -55,7 +60,7 @@
             </div>
         </form>
 
-        <!-- Для режимов — только сортировка -->
+        <!-- Сортировка для спец-режимов -->
         <form class="card form" method="get"
               th:if="${mode != null and mode != 'regular'}"
               th:action="@{${#httpServletRequest.requestURI}}">
@@ -73,28 +78,51 @@
             </div>
         </form>
 
+        <!-- Карточки -->
         <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
-            <article class="card car" th:each="c : ${cars}">
+            <article class="card car car--v2 card--hover" th:each="c : ${cars}">
+                <div class="car__media">
+                    <div class="img-skel shimmer">
+                        <img
+                                th:src="${c != null and c.photoUrl != null and !#strings.isEmpty(c.photoUrl) ?
+                                ((c.photoUrl.startsWith('http') or c.photoUrl.startsWith('/'))
+                                    ? c.photoUrl
+                                    : '/images/' + c.photoUrl)
+                               : '/images/placeholder-car.jpg'}"
+                                alt="" loading="lazy"
+                                onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+                    </div>
+                </div>
+
+                <!-- Заголовок + доступность -->
                 <div class="car__head">
                     <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
                     <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
                           th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
                 </div>
 
+                <!-- Каталог (локализованный статус) -->
+                <p class="text-muted" style="margin:6px 0 0;">
+                    <span class="chip"
+                          th:text="${c.catalog == 'REGULAR' ? 'Обычный' : (c.catalog == 'TAXI' ? 'Такси' : (c.catalog == 'DELIVER' ? 'Доставка' : c.catalog))}">
+                        Обычный
+                    </span>
+                </p>
+
+                <!-- Характеристики -->
                 <p class="text-muted">
                     <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
                     <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
                     <span th:text="'Год: ' + ${c.year}">Year</span>
                 </p>
 
-                <div class="car__price" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <!-- Цена + действия -->
+                <div class="car__price">
                     <div class="price"
                          th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
 
-                    <!-- ↓↓↓ ДОБАВЛЕНО: кнопка «Подробнее» -->
                     <div class="hero__actions" style="margin-top:8px;">
-                        <a class="btn btn--sm"
-                           th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
+                        <a class="btn btn--sm" th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
                     </div>
 
                     <a class="btn" th:href="@{/booking(carId=${c.id})}" sec:authorize="isAuthenticated()">Забронировать</a>

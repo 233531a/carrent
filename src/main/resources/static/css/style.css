@@ -1,5 +1,5 @@
 /* =========================================================
-   CarRent — High-Tech Neon Glass UI (Inter) + «мутный фонарик»
+   CarRent — High-Tech Neon Glass UI (Inter) + эффекты
    ========================================================= */
 
 :root{
@@ -16,7 +16,7 @@
     --ring:0 0 0 3px rgba(73,179,255,.32);
     --tr-f:.18s ease; --tr-m:.26s cubic-bezier(.2,.7,.2,1);
 
-    /* Controls + buttons (умеренные размеры) */
+    /* Controls + buttons */
     --ctrl-bg:linear-gradient(180deg, rgba(23,31,51,.92), rgba(15,22,36,.92));
     --ctrl-br:1px solid rgba(255,255,255,.14);
     --btn-h:40px; --btn-r:12px; --btn-fs:15px; --btn-fw:600;
@@ -25,7 +25,7 @@
 }
 
 /* -------- Base -------- */
-*{ box-sizing:border-box }
+*{ box-sizing:border-box; }
 html,body{
     margin:0; padding:0;
     background:
@@ -56,7 +56,7 @@ a:hover{ color:#d3e6ff }
     color:var(--text-2);
     padding:10px 12px; border-radius:var(--r-sm);
     display:inline-flex; align-items:center; gap:8px;
-    transition: background var(--tr-f), color var(--tr-f);
+    transition: background var(--tr-f), color var(--tr-f), transform .06s ease;
 }
 .nav > a:hover, .nav__dropdown > summary:hover{ color:#fff; background:rgba(255,255,255,.05) }
 .nav > a.is-active{ color:#fff; background:rgba(255,255,255,.07) }
@@ -66,7 +66,6 @@ a:hover{ color:#d3e6ff }
 .nav__dropdown > summary::-webkit-details-marker{ display:none }
 .nav__dropdown > summary::after{ content:"▾"; opacity:.85; font-size:.9em }
 
-/* стеклянный выпадающий список */
 .dropdown__menu{
     position:absolute; top:110%; left:0; min-width:230px; padding:10px;
     background:linear-gradient(180deg, rgba(15,22,36,.58), rgba(15,22,36,.48));
@@ -75,13 +74,12 @@ a:hover{ color:#d3e6ff }
     backdrop-filter: blur(16px) saturate(120%);
     opacity:0; transform: translateY(-6px); pointer-events:none;
     transition:opacity var(--tr-f), transform var(--tr-f);
-    z-index:1000; /* поверх hero */
+    z-index:1000;
 }
 .nav__dropdown[open] .dropdown__menu{ opacity:1; transform: translateY(0); pointer-events:auto }
 .dropdown__menu a{ display:block; padding:10px 12px; border-radius:10px; color:var(--text) }
 .dropdown__menu a:hover{ background:rgba(255,255,255,.06) }
 
-/* текстовые действия справа в хедере */
 .header-actions{ margin-left:auto; display:flex; align-items:center; gap:14px; flex-wrap:wrap }
 .btn-nav{
     all:unset; display:inline-flex; align-items:center; gap:8px;
@@ -106,7 +104,7 @@ a:hover{ color:#d3e6ff }
 .footer-nav a{ color:var(--text-2) }
 .footer-nav a:hover{ color:#fff }
 
-/* -------- HERO (живой фон) -------- */
+/* -------- HERO -------- */
 .hero{
     position:relative; overflow:hidden; border-radius:28px; padding:56px 36px;
     background:linear-gradient(180deg, rgba(18,24,38,.94), rgba(12,18,30,.96));
@@ -118,7 +116,6 @@ a:hover{ color:#d3e6ff }
 .hero h1{ margin:0 0 10px; font-size:44px; line-height:1.12; letter-spacing:.2px }
 .hero p{ color:#c8d3ea; margin:0 0 12px; font-size:18px }
 
-/* фон hero: сетка + движущиеся «фары» */
 .hero-bg{ position:absolute; inset:0; z-index:1; pointer-events:none; }
 .hero-bg::after{
     content:""; position:absolute; inset:0; opacity:.32;
@@ -154,7 +151,7 @@ a:hover{ color:#d3e6ff }
     100%{ transform:translate3d(0,0,0) scale(1.02) }
 }
 
-/* ——— Мутный «фонарик», мягко движется / реагирует на курсор ——— */
+/* ——— «фонарик» ——— */
 .has-spotlight{ position:relative; }
 .spotlight{
     --spot-x: 50%;
@@ -171,7 +168,7 @@ a:hover{ color:#d3e6ff }
     z-index:1;
 }
 
-/* -------- Кнопки (умеренный размер, не громоздкие) -------- */
+/* -------- Buttons -------- */
 .btn, .btn:link, .btn:visited,
 .form button:not(.input-eye){
     position:relative; display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -179,8 +176,9 @@ a:hover{ color:#d3e6ff }
     font-weight:var(--btn-fw); font-size:var(--btn-fs); line-height:1;
     color:#eaf0ff; background:transparent; border:1px solid rgba(255,255,255,.18);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-    transition: border-color var(--tr-f), color var(--tr-f), transform .06s ease;
+    transition: border-color var(--tr-f), color var(--tr-f), transform .06s ease, box-shadow var(--tr-f);
     cursor:pointer; text-decoration:none;
+    will-change: transform;
 }
 .btn::before, .form button:not(.input-eye)::before{
     content:""; position:absolute; inset:-8px; border-radius:inherit; z-index:-1;
@@ -191,19 +189,25 @@ a:hover{ color:#d3e6ff }
 }
 .btn:hover, .form button:not(.input-eye):hover{ border-color:rgba(73,179,255,.60) }
 .btn:hover::before, .form button:not(.input-eye):hover::before{ opacity:.65 }
-.btn:active, .form button:not(.input-eye):active{ transform:translateY(1px) }
-.btn:focus-visible, .form button:not(.input-eye):focus-visible{ outline:none; box-shadow:var(--ring) }
+.btn:active, .form button:not(.input-eye):active{ transform:translateY(1px) scale(.99) }
+.btn:focus-visible, .form button:not(.input-eye):focus-visible{
+    outline:none; box-shadow:0 0 0 3px rgba(73,179,255,.25), 0 0 0 10px rgba(73,179,255,.10);
+}
 .btn--danger{ border-color:rgba(255,106,126,.55); color:#ffe7ec }
 .btn--sm{ height:36px; padding:0 12px; border-radius:10px; font-size:14px }
 
-/* -------- Chips / Features -------- */
-.stats{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px }
-.stat{
-    padding:6px 10px; border-radius:999px;
+/* -------- Chips / Badges -------- */
+.chip{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
     border:1px solid rgba(255,255,255,.14);
-    background:rgba(255,255,255,.06); color:#dbe7ff; font-weight:600; font-size:13.5px;
+    background:rgba(255,255,255,.06); color:#dbe7ff; font-weight:700; font-size:12.5px;
 }
-.features{ margin-top:22px }
+.chip--ok{ border-color:rgba(62,208,178,.35); background:rgba(62,208,178,.12); color:#d7fff5 }
+.chip--warn{ border-color:rgba(255,106,126,.35); background:rgba(255,106,126,.12); color:#ffe7ec }
+
+.badge{ padding:.35rem .6rem; border-radius:999px; font-weight:700; font-size:12px }
+.text-bg-success{ background:rgba(62,208,178,.18); color:#cffff6; border:1px solid rgba(62,208,178,.35) }
+.text-bg-secondary{ background:rgba(160,170,190,.18); color:#e2e7f3; border:1px solid rgba(160,170,190,.28) }
 
 /* -------- Cards / Grid -------- */
 .grid{ display:grid; gap:18px }
@@ -215,33 +219,56 @@ a:hover{ color:#d3e6ff }
 .card{
     background:linear-gradient(180deg, rgba(16,23,37,.86), rgba(15,22,36,.86));
     border:var(--line); border-radius:var(--r-lg); padding:22px; position:relative; overflow:hidden;
-    transition: transform var(--tr-m), border-color var(--tr-f), background var(--tr-f);
+    transition: transform var(--tr-m), border-color var(--tr-f), background var(--tr-f), box-shadow var(--tr-f);
 }
-.card--link{ display:block }
-.card--link::after{
-    content:""; position:absolute; inset:-1px; border-radius:inherit;
-    background: radial-gradient(600px 200px at 80% -20%, rgba(73,179,255,.12), transparent 40%);
-    opacity:0; transition:opacity var(--tr-f); pointer-events:none;
+.card--hover{
+    will-change: transform, box-shadow;
 }
-.card--link:hover{ transform:translateY(-4px); border-color:rgba(73,179,255,.25) }
-.card--link:hover::after{ opacity:1 }
-
+.card--hover:hover{
+    transform:translateY(-6px);
+    box-shadow:0 26px 70px rgba(0,0,0,.35);
+}
 .page-title, .mt-0{ margin:0 0 14px } .mt-0{ margin-top:0 }
+
+/* --- Карточка авто: медиа --- */
+.car__media{ margin:-16px -16px 12px; overflow:hidden; border-top-left-radius:16px; border-top-right-radius:16px; }
+.img-skel{ position:relative; width:100%; aspect-ratio:16/9; background:var(--surface-2); border-bottom:var(--line); }
+.img-skel.big{ aspect-ratio:16/9; max-height:520px }
+.img-skel > img{
+    display:block; width:100%; height:100%; object-fit:cover; transform:scale(1.001);
+    transition: transform .6s cubic-bezier(.2,.7,.2,1), filter .3s ease;
+    will-change: transform;
+}
+.card--hover:hover .img-skel > img{ transform:scale(1.04) }
+
+/* shimmer-эффект для загрузки/заглушки */
+.shimmer::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(110deg, transparent 0 35%, rgba(255,255,255,.08) 45% 55%, transparent 65% 100%);
+    transform:translateX(-100%);
+    animation: shimmer 2.2s ease-in-out infinite;
+    pointer-events:none;
+}
+@keyframes shimmer{ to{ transform:translateX(100%) } }
+
+/* Блок с ценой и действиями */
+.car__price{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
+.price{ font-size:20px; font-weight:800; letter-spacing:.3px }
 
 /* -------- Forms -------- */
 label{
     display:block; margin:0 0 6px; color:#b7c3db;
-    font-size:12px; font-weight:600; letter-spacing:.32px; text-transform:uppercase;
+    font-size:12px; font-weight:700; letter-spacing:.32px; text-transform:uppercase;
 }
 input, .form-control, select, .form-select{
     width:100%; height:48px; padding:12px 14px;
     border-radius:var(--r-md); color:var(--text);
     background:var(--ctrl-bg); border:var(--ctrl-br);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-    transition:border-color var(--tr-f), box-shadow var(--tr-f), background var(--tr-f);
+    transition:border-color var(--tr-f), box-shadow var(--tr-f), background var(--tr-f), transform .08s ease;
 }
 input:hover, select:hover{ border-color:rgba(73,179,255,.28) }
-input:focus, select:focus{ border-color:rgba(73,179,255,.55); box-shadow:var(--ring); outline:none }
+input:focus, select:focus{ border-color:rgba(73,179,255,.55); box-shadow:var(--ring); outline:none; transform:translateY(-1px) }
 
 select, .form-select{
     appearance:none; -webkit-appearance:none; -moz-appearance:none;
@@ -259,15 +286,18 @@ input[type="checkbox"]{ accent-color:var(--c-cyan); width:18px; height:18px; bor
 @media (max-width:740px){ .form__grid{ grid-template-columns:1fr } }
 .form__actions{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap }
 
+/* Превью в админке */
+.preview .img-skel{ max-width:520px; border-radius:16px; overflow:hidden; border:var(--line); }
+
 /* -------- Tables -------- */
 .table-wrap{ overflow:auto }
 .table{ width:100%; border-collapse:collapse; font-size:14px }
 .table th, .table td{ padding:12px 12px; border-bottom:1px solid rgba(255,255,255,.08) }
-.table th{ color:#b6c2d8; font-weight:600; text-align:left; background:rgba(255,255,255,.02) }
-.table-hover tbody tr:hover{ background:rgba(255,255,255,.04) }
+.table th{ color:#b6c2d8; font-weight:700; text-align:left; background:rgba(255,255,255,.02) }
+.table-hover tbody tr:hover{ background:rgba(255,255,255,.04); transition: background .18s ease }
 .table-striped tbody tr:nth-child(odd){ background:rgba(255,255,255,.03) }
 
-/* -------- Auth pages (логин / регистрация) -------- */
+/* -------- Auth pages -------- */
 .auth-shell{
     position:relative; overflow:hidden; display:grid; place-items:center;
     min-height:calc(100dvh - 160px); padding:8vh 0 14vh;
@@ -304,15 +334,9 @@ input[type="checkbox"]{ accent-color:var(--c-cyan); width:18px; height:18px; bor
     transition: background var(--tr-f);
 }
 .input-eye:hover{ background:rgba(255,255,255,.08) }
-/* вертикальная форма на auth страницах */
 .form--auth .form__grid{ grid-template-columns:1fr }
 
-/* — фонарик на auth-страницах — */
-.auth-shell .spotlight{
-    --spot-x: 60%;
-    --spot-y: 40%;
-    opacity:.72;
-}
+.auth-shell .spotlight{ --spot-x: 60%; --spot-y: 40%; opacity:.72; }
 
 /* -------- Light theme -------- */
 .theme-light{
@@ -354,5 +378,5 @@ input[type="checkbox"]{ accent-color:var(--c-cyan); width:18px; height:18px; bor
 
 /* -------- Reduced motion -------- */
 @media (prefers-reduced-motion: reduce){
-    .dropdown__menu, .card, .hero-bg::after, .orb, .auth-shell::before{ animation:none; transition:none }
+    .dropdown__menu, .card, .hero-bg::after, .orb, .auth-shell::before, .shimmer::after{ animation:none; transition:none }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "cars")
@@ -45,6 +46,9 @@ public class Car {
     @PreUpdate
     public void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 
+    @Column(name = "photo_url")      // хранить относительный URL, напр. /images/camry.png
+    private String photoUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "catalog", nullable = false)
     private CatalogType catalog = CatalogType.REGULAR;
@@ -83,4 +87,7 @@ public class Car {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 }
