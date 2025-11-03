@@ -1,10 +1,15 @@
 <th:block th:with="title='Доступ запрещён', active='none'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <div class="card">
-            <h2 class="page-title">Нет доступа</h2>
-            <p class="alert alert--warn">У вас нет прав для просмотра этой страницы.</p>
-            <a class="btn" th:href="@{/}">На главную</a>
+        <div class="empty">
+            <h1 class="mt-0" style="font-size: 4rem; margin-bottom: var(--space-lg);">403</h1>
+            <h2 class="mt-0">Нет доступа</h2>
+            <div class="alert alert--warn" style="max-width: 500px; margin: var(--space-lg) auto;">
+                У вас нет прав для просмотра этой страницы.
+            </div>
+            <div class="hero__actions" style="justify-content:center; margin-top: var(--space-xl);">
+                <a class="btn" th:href="@{/}">На главную</a>
+            </div>
         </div>
     </th:block>
 </th:block>

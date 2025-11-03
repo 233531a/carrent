@@ -15,6 +15,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     List<Car> findByCatalog(CatalogType catalog);
 
+    Page<Car> findByCatalog(CatalogType catalog, Pageable pageable);
+
     @Query("""
        select c from Car c
        where (:q is null or lower(c.make) like lower(concat('%',:q,'%'))

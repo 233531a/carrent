@@ -1,18 +1,50 @@
-<th:block th:with="title='Спецпредложения — Доставка', active='cars'"
+<th:block th:with="title='Автомобили для доставки', active='cars'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}"
-          xmlns:th="http://www.thymeleaf.org">
-
+          xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <th:block th:fragment="content">
 
-        <h2 class="page-title">Спецпредложения для доставки</h2>
-        <p class="text-muted" style="margin-top:-8px;">Доступно для сотрудников с ролью EMPLOYEE/MANAGER/ADMIN.</p>
+        <!-- Инфо-блок для режимов -->
+        <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom: var(--space-md);">
+            <span class="chip"
+                  th:text="${mode == 'taxi' ? 'Спец-подборка для такси'
+                                 : (mode == 'delivery' ? 'Спец-подборка для доставки' : mode)}">Режим</span>
+            <p class="text-muted" style="margin-top: var(--space-sm);">Здесь показываются автомобили для выбранного направления.</p>
+        </div>
 
-        <!-- ТОЛЬКО сортировка (по желанию) -->
-        <form class="card form" method="get" th:action="@{/cars/delivery}">
+        <h2 class="page-title">Каталог автомобилей для доставки</h2>
+
+        <!-- Фильтры: полный набор -->
+        <form class="card form form--filters filters-v2" th:action="@{/cars/delivery}" method="get">
+            <div class="filters-v2__bar">
+                <button class="btn btn--sm" type="submit">Фильтр</button>
+                <a class="btn btn--sm btn--light" th:href="@{/cars/delivery}">Сброс</a>
+            </div>
             <div class="form__grid">
                 <div>
+                    <label>Марка/Модель</label>
+                    <input type="text" name="q" placeholder="Например, Toyota" th:value="${q}">
+                </div>
+                <div>
+                    <label>Класс</label>
+                    <select name="vehicleClass" th:value="${vehicleClass}">
+                        <option value="">Любой</option>
+                        <option>Эконом</option><option>Комфорт</option><option>Бизнес</option>
+                        <option>Паркетник</option><option>Внедорожник</option><option>Премиум</option>
+                    </select>
+                </div>
+                <div>
+                    <label>КПП</label>
+                    <select name="transmission" th:value="${transmission}">
+                        <option value="">Любая</option><option>AT</option><option>MT</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Цена до, ₽/день</label>
+                    <input type="number" name="maxPrice" step="100" th:value="${maxPrice}">
+                </div>
+                <div>
                     <label>Сортировка</label>
-                    <select name="sort" th:value="${sort}" onchange="this.form.submit()">
+                    <select name="sort" th:value="${sort}">
                         <option th:value="${null}" th:selected="${sort==null}">Без сортировки</option>
                         <option value="price_asc"  th:selected="${sort=='price_asc'}">Цена ↑</option>
                         <option value="price_desc" th:selected="${sort=='price_desc'}">Цена ↓</option>
@@ -21,36 +53,59 @@
                     </select>
                 </div>
             </div>
+            <div class="form__actions">
+                <button class="btn" type="submit">Фильтровать</button>
+                <a class="btn btn--light" th:href="@{/cars/delivery}">Сбросить</a>
+            </div>
         </form>
 
-        <!-- Список авто -->
+        <!-- Карточки -->
         <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
-            <article class="card car" th:each="c : ${cars}">
+            <article class="card car car--v2 card--hover" th:each="c : ${cars}">
+                <div class="car__media">
+                    <div class="img-skel shimmer">
+                        <img
+                                th:src="${c != null and c.photoUrl != null and !#strings.isEmpty(c.photoUrl) ?
+                                ((c.photoUrl.startsWith('http') or c.photoUrl.startsWith('/'))
+                                    ? c.photoUrl
+                                    : '/images/' + c.photoUrl)
+                               : '/images/placeholder-car.jpg'}"
+                                alt="" loading="lazy"
+                                onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+                    </div>
+                </div>
+
+                <!-- Заголовок + доступность -->
                 <div class="car__head">
                     <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
                     <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
                           th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
                 </div>
 
+                <!-- Характеристики -->
                 <p class="text-muted">
                     <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
                     <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
                     <span th:text="'Год: ' + ${c.year}">Year</span>
                 </p>
 
-                <div class="car__price" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <!-- Цена + действия -->
+                <div class="car__price">
                     <div class="price"
                          th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
 
-                    <div class="hero__actions" style="margin-top:8px;">
+                    <div class="hero__actions" style="margin-top: var(--space-sm);">
                         <a class="btn btn--sm" th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
                     </div>
+
+                    <a class="btn" th:href="@{/booking(carId=${c.id})}" sec:authorize="isAuthenticated()">Забронировать</a>
+                    <a class="btn btn--light" th:href="@{/login(from='booking')}" sec:authorize="isAnonymous()">Забронировать</a>
                 </div>
             </article>
         </div>
 
         <div class="empty" th:if="${#lists.size(cars) == 0}">
-            <p>Пока подходящих авто для «Доставки» нет.</p>
+            <p>Ничего не найдено. Измените фильтры.</p>
         </div>
 
     </th:block>

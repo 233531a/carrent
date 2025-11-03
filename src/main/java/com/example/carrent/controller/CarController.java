@@ -75,40 +75,104 @@ public class CarController {
 
     // ====== ТАКСИ (TAXI) ======
     @GetMapping("/cars/taxi")
-    public String taxiCatalog(@RequestParam(required=false) String sort, Model model) {
-        var cars = carRepo.findAll().stream()
-                .filter(c -> c.getCatalog() == CatalogType.TAXI)
-                .toList();
-        // опционально применить сортировку по sort
-        model.addAttribute("cars", cars);
-        model.addAttribute("mode", "taxi");
-        return "cars-taxi"; // у тебя отдельный шаблон — ок
-    }
+    public String taxiCatalog(@RequestParam(required = false) String q,
+                              @RequestParam(required = false) String vehicleClass,
+                              @RequestParam(required = false) String transmission,
+                              @RequestParam(required = false) BigDecimal maxPrice,
+                              @RequestParam(required = false) String sort,
+                              Model model) {
 
-    @GetMapping("/cars/delivery")
-    public String deliveryCatalog(@RequestParam(required=false) String sort, Model model) {
-        var cars = carRepo.findAll().stream()
-                .filter(c -> c.getCatalog() == CatalogType.DELIVERY)
-                .toList();
-        model.addAttribute("cars", cars);
-        model.addAttribute("mode", "delivery");
-        return "cars-delivery"; // отдельный шаблон — ок
-    }
+        List<Car> cars = carRepo.findByCatalog(CatalogType.TAXI);
 
-    private void applySort(List<Car> cars, String sort) {
-        if (sort == null) return;
-        switch (sort) {
-            case "price_asc" -> cars.sort(Comparator.comparing(
-                    Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)));
-            case "price_desc" -> cars.sort(Comparator.comparing(
-                    Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)).reversed());
-            case "make" -> cars.sort(Comparator.comparing(
-                    c -> Optional.ofNullable(c.getMake()).orElse("")));
-            case "newest" -> cars.sort(Comparator.comparing(
-                    Car::getYear, Comparator.nullsLast(Integer::compareTo)).reversed());
-            default -> {}
+        String qq = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
+        String vc = vehicleClass == null ? "" : vehicleClass.trim().toLowerCase(Locale.ROOT);
+        String tr = transmission == null ? "" : transmission.trim().toLowerCase(Locale.ROOT);
+
+        List<Car> filtered = cars.stream()
+                .filter(c -> qq.isBlank() ||
+                        (c.getMake() != null && c.getMake().toLowerCase(Locale.ROOT).contains(qq)) ||
+                        (c.getModel() != null && c.getModel().toLowerCase(Locale.ROOT).contains(qq)))
+                .filter(c -> vc.isBlank() ||
+                        (c.getVehicleClass() != null && c.getVehicleClass().toLowerCase(Locale.ROOT).equals(vc)))
+                .filter(c -> tr.isBlank() ||
+                        (c.getTransmission() != null && c.getTransmission().toLowerCase(Locale.ROOT).equals(tr)))
+                .filter(c -> maxPrice == null || (c.getDailyPrice() != null && c.getDailyPrice().compareTo(maxPrice) <= 0))
+                .collect(Collectors.toList());
+
+        if (sort != null) {
+            switch (sort) {
+                case "price_asc" -> filtered.sort(Comparator.comparing(
+                        Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)));
+                case "price_desc" -> filtered.sort(Comparator.comparing(
+                        Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)).reversed());
+                case "make" -> filtered.sort(Comparator.comparing(
+                        c -> Optional.ofNullable(c.getMake()).orElse("")));
+                case "newest" -> filtered.sort(Comparator.comparing(
+                        Car::getYear, Comparator.nullsLast(Integer::compareTo)).reversed());
+                default -> {}
+            }
         }
+
+        model.addAttribute("cars", filtered);
+        model.addAttribute("q", q);
+        model.addAttribute("vehicleClass", vehicleClass);
+        model.addAttribute("transmission", transmission);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("sort", sort);
+        model.addAttribute("mode", "taxi");
+        return "cars-taxi";
     }
+
+    // ====== ДОСТАВКА (DELIVERY) ======
+    @GetMapping("/cars/delivery")
+    public String deliveryCatalog(@RequestParam(required = false) String q,
+                                  @RequestParam(required = false) String vehicleClass,
+                                  @RequestParam(required = false) String transmission,
+                                  @RequestParam(required = false) BigDecimal maxPrice,
+                                  @RequestParam(required = false) String sort,
+                                  Model model) {
+
+        List<Car> cars = carRepo.findByCatalog(CatalogType.DELIVERY);
+
+        String qq = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
+        String vc = vehicleClass == null ? "" : vehicleClass.trim().toLowerCase(Locale.ROOT);
+        String tr = transmission == null ? "" : transmission.trim().toLowerCase(Locale.ROOT);
+
+        List<Car> filtered = cars.stream()
+                .filter(c -> qq.isBlank() ||
+                        (c.getMake() != null && c.getMake().toLowerCase(Locale.ROOT).contains(qq)) ||
+                        (c.getModel() != null && c.getModel().toLowerCase(Locale.ROOT).contains(qq)))
+                .filter(c -> vc.isBlank() ||
+                        (c.getVehicleClass() != null && c.getVehicleClass().toLowerCase(Locale.ROOT).equals(vc)))
+                .filter(c -> tr.isBlank() ||
+                        (c.getTransmission() != null && c.getTransmission().toLowerCase(Locale.ROOT).equals(tr)))
+                .filter(c -> maxPrice == null || (c.getDailyPrice() != null && c.getDailyPrice().compareTo(maxPrice) <= 0))
+                .collect(Collectors.toList());
+
+        if (sort != null) {
+            switch (sort) {
+                case "price_asc" -> filtered.sort(Comparator.comparing(
+                        Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)));
+                case "price_desc" -> filtered.sort(Comparator.comparing(
+                        Car::getDailyPrice, Comparator.nullsLast(BigDecimal::compareTo)).reversed());
+                case "make" -> filtered.sort(Comparator.comparing(
+                        c -> Optional.ofNullable(c.getMake()).orElse("")));
+                case "newest" -> filtered.sort(Comparator.comparing(
+                        Car::getYear, Comparator.nullsLast(Integer::compareTo)).reversed());
+                default -> {}
+            }
+        }
+
+        model.addAttribute("cars", filtered);
+        model.addAttribute("q", q);
+        model.addAttribute("vehicleClass", vehicleClass);
+        model.addAttribute("transmission", transmission);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("sort", sort);
+        model.addAttribute("mode", "delivery");
+        return "cars-delivery";
+    }
+
 
     // ====== ДЕТАЛИ ======
     @GetMapping("/cars/{id}")

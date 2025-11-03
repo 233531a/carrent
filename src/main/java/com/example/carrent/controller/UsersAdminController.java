@@ -33,9 +33,21 @@ public class UsersAdminController {
     }
 
     @GetMapping
-    public String list(Model model) {
+    public String list(@RequestParam(value = "q", required = false) String query, Model model) {
         model.addAttribute("title", "Управление пользователями");
-        model.addAttribute("users", userRepo.findAll());
+        
+        List<User> users;
+        if (query != null && !query.trim().isEmpty()) {
+            String searchQuery = query.trim().toLowerCase();
+            users = userRepo.findAll().stream()
+                    .filter(u -> u.getUsername().toLowerCase().contains(searchQuery))
+                    .toList();
+            model.addAttribute("q", query);
+        } else {
+            users = userRepo.findAll();
+        }
+        
+        model.addAttribute("users", users);
         model.addAttribute("allRoles", roleRepo.findAll());
         return "users"; // templates/users.html
     }

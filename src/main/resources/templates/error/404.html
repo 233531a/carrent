@@ -1,13 +1,14 @@
 <th:block th:with="title='Страница не найдена', active=''"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <section class="card" style="text-align:center; padding:40px;">
-            <h1 class="mt-0">404 — Страница не найдена</h1>
-            <p class="text-muted">Мы не смогли найти адрес <code th:text="${path}">/unknown</code>.</p>
-            <div class="hero__actions" style="justify-content:center; margin-top:16px;">
+        <div class="empty">
+            <h1 class="mt-0" style="font-size: 4rem; margin-bottom: var(--space-lg);">404</h1>
+            <h2 class="mt-0">Страница не найдена</h2>
+            <p>Мы не смогли найти адрес <code th:text="${path}">/unknown</code>.</p>
+            <div class="hero__actions" style="justify-content:center; margin-top: var(--space-xl);">
                 <a class="btn" th:href="@{/}">На главную</a>
                 <a class="btn btn--light" th:href="@{/cars}">В каталог</a>
             </div>
-        </section>
+        </div>
     </th:block>
 </th:block>

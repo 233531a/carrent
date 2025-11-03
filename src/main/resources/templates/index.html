@@ -1,51 +1,110 @@
 <th:block th:with="title='Главная', active='home'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
+        <style>
+            /* Simple floating blobs for hero background */
+            .hero-anim-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+            .hero-anim-bg .blob { position: absolute; width: 420px; height: 420px; border-radius: 50%; filter: blur(40px); opacity: .25; animation: float 14s ease-in-out infinite; }
+            .hero-anim-bg .blob--1 { left: -80px; top: -60px; background: radial-gradient(closest-side, #60a5fa, rgba(96,165,250,0)); animation-delay: 0s; }
+            .hero-anim-bg .blob--2 { right: -120px; top: -40px; background: radial-gradient(closest-side, #a78bfa, rgba(167,139,250,0)); animation-delay: 3s; }
+            .hero-anim-bg .blob--3 { left: 10%; bottom: -140px; background: radial-gradient(closest-side, #34d399, rgba(52,211,153,0)); animation-delay: 6s; }
+            @keyframes float { 0%,100%{ transform: translateY(0) translateX(0) scale(1);} 50%{ transform: translateY(-30px) translateX(10px) scale(1.05);} }
+        </style>
 
         <!-- HERO -->
-        <section class="hero has-spotlight">
-            <!-- фон: сетка + «фары» + мягкий фонарик + боке-пузыри -->
-            <div class="hero-bg" aria-hidden="true">
-                <span class="orb orb--a"></span>
-                <span class="orb orb--b"></span>
-                <span class="spotlight" id="heroLight" aria-hidden="true"></span>
-
-                <div class="bokeh" aria-hidden="true">
-                    <span style="--i:0;"></span>
-                    <span style="--i:1;"></span>
-                    <span style="--i:2;"></span>
-                    <span style="--i:3;"></span>
-                    <span style="--i:4;"></span>
-                    <span style="--i:5;"></span>
-                    <span style="--i:6;"></span>
-                    <span style="--i:7;"></span>
-                </div>
+        <section class="hero" style="background-image: radial-gradient(1200px 400px at 80% 10%, rgba(99,102,241,0.25), rgba(99,102,241,0) 60%), radial-gradient(800px 300px at 10% 0%, rgba(59,130,246,0.2), rgba(59,130,246,0) 60%);">
+            <div class="hero__bg-decoration">
+                <div class="hero__bg-circle hero__bg-circle--1"></div>
+                <div class="hero__bg-circle hero__bg-circle--2"></div>
+                <div class="hero__bg-circle hero__bg-circle--3"></div>
             </div>
-
+            
+            <div class="hero-anim-bg" aria-hidden="true">
+                <div class="blob blob--1"></div>
+                <div class="blob blob--2"></div>
+                <div class="blob blob--3"></div>
+            </div>
+            
             <div class="hero__content">
-                <h1>CarRent — high-tech аренда автомобилей</h1>
-                <p>Быстрый каталог, заявка за минуты и прозрачные статусы:
+                <h1 class="hero__title" style="background: linear-gradient(90deg, #60a5fa, #a78bfa 50%, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent;">Rentify — Аренда автомобилей нового поколения</h1>
+                <p class="hero__description">Быстрый каталог, заявка за минуты и прозрачные статусы:
                     <strong>Ожидание</strong> → <strong>Активна</strong> → <strong>Завершена</strong>.</p>
 
                 <div class="hero__actions">
                     <a class="btn" th:href="@{/cars}">Каталог</a>
-                    <a class="btn" th:href="@{/booking}">Оформить заявку</a>
+                    <a class="btn btn--outline" th:href="@{/booking}">Оформить заявку</a>
                 </div>
 
                 <div class="stats">
-                    <div class="stat">100+ авто в парке</div>
+                    <div class="stat" th:text="${fleetCount} + ' авто в парке'">42 авто в парке</div>
                     <div class="stat">Одобрение ~15 минут</div>
                     <div class="stat">Поддержка 24/7</div>
                 </div>
             </div>
         </section>
 
+        <!-- Информационная секция -->
+        <section class="info-section">
+            <div class="container">
+                <div class="info-grid">
+                    <div class="info-card info-card--fade-in">
+                        <div class="info-card__icon">🚗</div>
+                        <h3>Большой выбор</h3>
+                        <p>Автомобили различных классов — от эконом до премиум. Найдёте то, что нужно!</p>
+                    </div>
+                    <div class="info-card info-card--fade-in">
+                        <div class="info-card__icon">⚡</div>
+                        <h3>Быстрое оформление</h3>
+                        <p>Оформление заявки занимает всего несколько минут. Одобрение приходит в течение 15 минут.</p>
+                    </div>
+                    <div class="info-card info-card--fade-in">
+                        <div class="info-card__icon">🛡️</div>
+                        <h3>Полная защита</h3>
+                        <p>Все автомобили застрахованы. КАСКО и ОСАГО включены в стоимость аренды.</p>
+                    </div>
+                    <div class="info-card info-card--fade-in">
+                        <div class="info-card__icon">📱</div>
+                        <h3>Удобный сервис</h3>
+                        <p>Отслеживайте статус заявки в реальном времени. Вся информация всегда под рукой.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Как это работает: 3 шага -->
+        <section class="info-section">
+            <div class="container">
+                <div class="grid grid--3">
+                    <div class="card">
+                        <h3 class="mt-0">1. Выберите авто</h3>
+                        <p class="text-muted">Откройте каталог и подберите модель под ваши задачи.</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="mt-0">2. Оформите заявку</h3>
+                        <p class="text-muted">Заполните короткую форму — одобрение обычно за 15 минут.</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="mt-0">3. Заберите и ездите</h3>
+                        <p class="text-muted">Получите ключи в пункте выдачи и наслаждайтесь поездкой.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Опционально: превью модели/аналитики -->
+        <section class="features features--fade-in">
+            <div class="card">
+                <h3 class="mt-0">Смарт‑подбор автомобиля</h3>
+                <p class="text-muted">Наш алгоритм анализирует параметры и подсказывает подходящие модели. <a th:href="@{/cars}">Попробовать</a>.</p>
+            </div>
+        </section>
+
         <!-- Превью ассортимента -->
-        <section class="catalog-preview">
+        <section class="catalog-preview catalog-preview--fade-in">
             <div class="section-head">
                 <h2 class="mt-0">Популярные предложения</h2>
                 <div class="head-actions">
-                    <a class="btn btn--sm" th:href="@{/cars}">Смотреть всё</a>
+                    <a class="btn btn--sm btn--outline" th:href="@{/cars}">Смотреть всё</a>
                 </div>
             </div>
 
@@ -53,22 +112,21 @@
             <div class="scroller" th:if="${carsTop} != null and ${#lists.size(carsTop)} > 0">
                 <article class="car-card" th:each="car : ${carsTop}">
                     <a class="car-card__media" th:href="@{'/cars/' + ${car.id}}">
-                        <img th:src="${car.imageUrl} ?: @{/img/car-placeholder.jpg}"
-                             th:alt="${car.brand + ' ' + car.model}" loading="lazy">
+                        <img th:src="${car.photoUrl} ?: @{/img/car-placeholder.jpg}"
+                             th:alt="${car.make + ' ' + car.model}" loading="lazy">
                     </a>
                     <div class="car-card__body">
-                        <div class="car-card__title" th:text="${car.brand + ' ' + car.model}">Toyota Camry</div>
+                        <div class="car-card__title" th:text="${car.make + ' ' + car.model}">Toyota Camry</div>
                         <div class="car-card__tags">
                             <span th:text="${car.transmission}">AT</span>
-                            <span th:text="${car.fuelType}">Бензин</span>
-                            <span th:text="${car.className}">D-класс</span>
+                            <span th:text="${car.vehicleClass}">D-класс</span>
                         </div>
                         <div class="car-card__foot">
                             <div class="price">
-                                <span th:text="${#numbers.formatDecimal(car.pricePerDay,0,'WHITESPACE',0,'POINT')}"></span>
+                                <span th:text="${#numbers.formatDecimal(car.dailyPrice,0,'WHITESPACE',0,'POINT')}"></span>
                                 <span>₽/сутки</span>
                             </div>
-                            <a class="btn btn--sm" th:href="@{'/cars/' + ${car.id}}">Детали</a>
+                            <a class="btn btn--sm btn--outline" th:href="@{'/cars/' + ${car.id}}">Детали</a>
                         </div>
                     </div>
                 </article>
@@ -92,7 +150,7 @@
         </section>
 
         <!-- Преимущества -->
-        <section class="features">
+        <section class="features features--fade-in">
             <div class="grid grid--3">
                 <div class="card">
                     <h3 class="mt-0">Честные цены</h3>
@@ -109,31 +167,5 @@
             </div>
         </section>
 
-        <script>
-            // Мягкий «фонарик» + медленный дрейф
-            (function(){
-                const el = document.getElementById('heroLight');
-                if(!el) return;
-                let tX = 50, tY = 40, cX = tX, cY = tY, ease = 0.06, drift = 0;
-                const loop = () => {
-                    cX += (tX - cX) * ease; cY += (tY - cY) * ease;
-                    el.style.setProperty('--spot-x', cX + '%');
-                    el.style.setProperty('--spot-y', cY + '%');
-                    requestAnimationFrame(loop);
-                };
-                const driftLoop = () => {
-                    drift += 0.0025;
-                    tX = 50 + Math.sin(drift) * 20;
-                    tY = 45 + Math.cos(drift * 0.8) * 16;
-                    requestAnimationFrame(driftLoop);
-                };
-                document.querySelector('.hero')?.addEventListener('mousemove', (e)=>{
-                    const r = e.currentTarget.getBoundingClientRect();
-                    tX = ((e.clientX - r.left)/r.width)*100;
-                    tY = ((e.clientY - r.top)/r.height)*100;
-                });
-                loop(); driftLoop();
-            })();
-        </script>
     </th:block>
 </th:block>

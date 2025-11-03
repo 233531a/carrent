@@ -1,6 +1,7 @@
 package com.example.carrent.controller;
 
 import com.example.carrent.model.Car;
+import com.example.carrent.model.CatalogType;
 import com.example.carrent.repository.CarRepository;
 import com.example.carrent.service.BookingService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/booking")
@@ -27,8 +29,29 @@ public class BookingController {
 
     @GetMapping
     public String bookingPage(@RequestParam(value = "carId", required = false) Long carId,
+                              @AuthenticationPrincipal UserDetails principal,
                               Model model) {
-        List<Car> cars = carRepo.findAll();
+        List<Car> cars;
+        
+        // Check if user has only CLIENT role
+        boolean isClientOnly = principal != null && 
+            principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT")) &&
+            principal.getAuthorities().stream()
+                .noneMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE") || 
+                               a.getAuthority().equals("ROLE_MANAGER") || 
+                               a.getAuthority().equals("ROLE_ADMIN"));
+        
+        if (isClientOnly) {
+            // Clients can only book REGULAR cars
+            cars = carRepo.findAll().stream()
+                    .filter(c -> c.getCatalog() == CatalogType.REGULAR)
+                    .collect(Collectors.toList());
+        } else {
+            // Others (employees, managers, admins) can book REGULAR, TAXI, or DELIVERY
+            cars = carRepo.findAll();
+        }
+        
         model.addAttribute("cars", cars);
         model.addAttribute("selectedCarId", carId);
         return "booking";
@@ -46,7 +69,25 @@ public class BookingController {
         if (startDate == null || endDate == null
                 || startDate.isBefore(today)
                 || endDate.isBefore(startDate)) {
-            List<Car> cars = carRepo.findAll();
+            List<Car> cars;
+            
+            // Apply same filtering as in bookingPage
+            boolean isClientOnly = principal != null && 
+                principal.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT")) &&
+                principal.getAuthorities().stream()
+                    .noneMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE") || 
+                                   a.getAuthority().equals("ROLE_MANAGER") || 
+                                   a.getAuthority().equals("ROLE_ADMIN"));
+            
+            if (isClientOnly) {
+                cars = carRepo.findAll().stream()
+                        .filter(c -> c.getCatalog() == CatalogType.REGULAR)
+                        .collect(Collectors.toList());
+            } else {
+                cars = carRepo.findAll();
+            }
+            
             model.addAttribute("cars", cars);
             model.addAttribute("selectedCarId", carId);
             String err = (startDate == null || endDate == null)

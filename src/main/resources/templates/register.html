@@ -1,40 +1,98 @@
 <th:block th:with="title='Регистрация', active='register'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <!-- Полноэкранный бэкдроп -->
-        <div class="auth-backdrop has-spotlight" aria-hidden="true">
-            <span class="spotlight" id="authLightReg"></span>
-        </div>
+        <style>
+            /* Animated gradient and floating shapes for auth pages */
+            .auth-bg-anim { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+            .auth-bg-anim .ring { position: absolute; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(closest-side, rgba(96,165,250,.35), rgba(96,165,250,0)); filter: blur(30px); animation: drift 18s ease-in-out infinite; }
+            .auth-bg-anim .ring--violet { background: radial-gradient(closest-side, rgba(167,139,250,.35), rgba(167,139,250,0)); }
+            .auth-bg-anim .ring--green { background: radial-gradient(closest-side, rgba(52,211,153,.35), rgba(52,211,153,0)); }
+            .auth-bg-anim .ring--1 { left: -140px; top: -120px; animation-delay: 0s; }
+            .auth-bg-anim .ring--2 { right: -160px; top: -40px; animation-delay: 4s; }
+            .auth-bg-anim .ring--3 { left: 20%; bottom: -160px; animation-delay: 8s; }
+            @keyframes drift { 0%,100%{ transform: translate(0,0) scale(1);} 50%{ transform: translate(20px,-30px) scale(1.06);} }
+        </style>
+        <div class="auth-shell auth-shell--register auth-shell--compact">
 
-        <div class="auth-shell">
+            <!-- Form Card -->
             <div class="auth-card">
-                <h2 class="page-title auth-title">Создать аккаунт</h2>
+                <div class="auth-card__header" style="background: linear-gradient(90deg, rgba(96,165,250,0.12), rgba(167,139,250,0.12)); border-radius: 12px;">
+                    <h2 class="page-title auth-title">Регистрация</h2>
+                    <p class="auth-subtitle">Создайте аккаунт для бронирования</p>
+                </div>
 
                 <p class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка регистрации</p>
 
                 <form th:action="@{/register}" method="post" class="form form--auth">
-                    <div class="form__grid">
+                    <div class="form__grid form__grid--single">
                         <div class="field">
                             <label for="reg_username">Логин</label>
                             <div class="input-wrap">
-                                <input id="reg_username" type="text" name="username" minlength="3" maxlength="100" required/>
+                                <input id="reg_username" type="text" name="username" placeholder="Минимум 3 символа" minlength="3" maxlength="100" required/>
                             </div>
                         </div>
 
                         <div class="field field--password">
                             <label for="regPassword">Пароль</label>
                             <div class="input-wrap">
-                                <input id="regPassword" type="password" name="password" minlength="6" required/>
-                                <button type="button" class="input-eye" onclick="togglePwd('regPassword', this)" aria-label="Показать/скрыть пароль">👁</button>
+                                <input id="regPassword" type="password" name="password" placeholder="Минимум 6 символов" minlength="6" required/>
+                                <button type="button" class="input-eye" onclick="togglePwd('regPassword', this)" aria-label="Показать/скрыть пароль">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
                             </div>
+                            <div class="pwd-strength" aria-live="polite">
+                                <div class="pwd-strength__bar" id="pwdBar"></div>
+                                <div class="pwd-strength__label" id="pwdLabel">Надёжность пароля</div>
+                            </div>
+                            <ul class="field-hints">
+                                <li>Минимум 8 символов</li>
+                                <li>Рекомендуем буквы верхнего/нижнего регистра, цифры и символы</li>
+                            </ul>
+                        </div>
+
+                        <div class="field field--password">
+                            <label for="regConfirmPassword">Подтвердите пароль</label>
+                            <div class="input-wrap">
+                                <input id="regConfirmPassword" type="password" name="confirmPassword" placeholder="Повторите пароль" minlength="6" required/>
+                                <button type="button" class="input-eye" onclick="togglePwd('regConfirmPassword', this)" aria-label="Показать/скрыть пароль">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <small class="field-hint" id="pwdMatchHint"></small>
                         </div>
                     </div>
 
                     <div class="form__actions">
-                        <button class="btn" type="submit">Зарегистрироваться</button>
-                        <a class="btn btn--light" th:href="@{/login}">У меня уже есть аккаунт</a>
+                        <button class="btn btn--primary" type="submit">
+                            <span>Зарегистрироваться</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <a class="btn btn--light" th:href="@{/login}">
+                            <span>У меня уже есть аккаунт</span>
+                        </a>
                     </div>
                 </form>
+                <div class="auth-extra">
+                    <div class="auth-links">
+                        <a th:href="@{/privacy}">Политика конфиденциальности</a>
+                        <span>•</span>
+                        <a th:href="@{/terms}">Условия сервиса</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Removed car visual; animated background is applied globally on auth pages -->
+            <div class="auth-bg-anim" aria-hidden="true">
+                <div class="ring ring--1"></div>
+                <div class="ring ring--2 ring--violet"></div>
+                <div class="ring ring--3 ring--green"></div>
             </div>
         </div>
 
@@ -47,22 +105,45 @@
                 btn.setAttribute('aria-label', t === 'password' ? 'Показать пароль' : 'Скрыть пароль');
             }
             (function(){
-                const el = document.getElementById('authLightReg');
-                if(!el) return;
-                let tX = 60, tY = 42, cX = tX, cY = tY, ease = 0.06;
-                const loop = () => {
-                    cX += (tX - cX)*ease; cY += (tY - cY)*ease;
-                    el.style.setProperty('--spot-x', cX + '%');
-                    el.style.setProperty('--spot-y', cY + '%');
-                    requestAnimationFrame(loop);
+                const pwd = document.getElementById('regPassword');
+                const confirm = document.getElementById('regConfirmPassword');
+                const bar = document.getElementById('pwdBar');
+                const label = document.getElementById('pwdLabel');
+                const matchHint = document.getElementById('pwdMatchHint');
+                if (!pwd) return;
+                const score = (v) => {
+                    let s = 0;
+                    if (!v) return 0;
+                    if (v.length >= 8) s++;
+                    if (/[A-Z]/.test(v)) s++;
+                    if (/[a-z]/.test(v)) s++;
+                    if (/\d/.test(v)) s++;
+                    if (/[^A-Za-z0-9]/.test(v)) s++;
+                    return Math.min(s, 5);
                 };
-                document.addEventListener('mousemove',(e)=>{
-                    const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-                    const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-                    tX = (e.clientX / vw) * 100;
-                    tY = (e.clientY / vh) * 100;
-                });
-                loop();
+                const update = () => {
+                    const s = score(pwd.value);
+                    const pct = (s/5)*100;
+                    if (bar) bar.style.width = pct + '%';
+                    if (bar) bar.dataset.level = String(s);
+                    if (label) {
+                        label.textContent = s <= 2 ? 'Слабый пароль' : (s === 3 ? 'Средний пароль' : 'Сильный пароль');
+                    }
+                    if (confirm && matchHint) {
+                        if (!confirm.value) {
+                            matchHint.textContent = '';
+                        } else if (confirm.value !== pwd.value) {
+                            matchHint.textContent = 'Пароли не совпадают';
+                            matchHint.style.color = 'var(--warning)';
+                        } else {
+                            matchHint.textContent = 'Пароли совпадают';
+                            matchHint.style.color = 'var(--success)';
+                        }
+                    }
+                };
+                pwd.addEventListener('input', update);
+                if (confirm) confirm.addEventListener('input', update);
+                update();
             })();
         </script>
     </th:block>

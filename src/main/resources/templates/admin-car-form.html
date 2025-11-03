@@ -2,93 +2,153 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <div class="page-head" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="page-head">
             <h2 class="mt-0" th:text="${titleForm}">Автомобиль</h2>
-            <a class="btn btn--light" th:href="@{/admin/cars}">← Назад</a>
+            <a class="btn btn--light" th:href="@{/admin/cars}">← Назад к списку</a>
         </div>
 
-        <form class="card form" th:object="${car}"
+        <form class="form" th:object="${car}"
               th:action="${car.id} != null ? @{|/admin/cars/${car.id}|} : @{/admin/cars}"
               method="post">
 
-            <div class="form__grid">
-                <!-- Марка -->
-                <div>
-                    <label>Марка</label>
-                    <input th:field="*{make}" required>
-                    <small class="text-muted" th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
-                </div>
+            <!-- Основная информация -->
+            <div class="card" style="margin-bottom: var(--space-xl);">
+                <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border); color: var(--text-primary);">
+                    Основная информация
+                </h3>
+                <div class="form__grid">
+                    <!-- Марка -->
+                    <div class="field">
+                        <label>Марка <span style="color: var(--danger);">*</span></label>
+                        <input th:field="*{make}" required placeholder="Например, Toyota">
+                        <small class="text-muted" style="display: block; margin-top: var(--space-xs);" 
+                               th:if="${#fields.hasErrors('make')}" th:errors="*{make}"></small>
+                    </div>
 
-                <!-- Модель -->
-                <div>
-                    <label>Модель</label>
-                    <input th:field="*{model}" required>
-                    <small class="text-muted" th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
-                </div>
+                    <!-- Модель -->
+                    <div class="field">
+                        <label>Модель <span style="color: var(--danger);">*</span></label>
+                        <input th:field="*{model}" required placeholder="Например, Camry">
+                        <small class="text-muted" style="display: block; margin-top: var(--space-xs);" 
+                               th:if="${#fields.hasErrors('model')}" th:errors="*{model}"></small>
+                    </div>
 
-                <!-- Класс (строка) -->
-                <div>
-                    <label>Класс</label>
-                    <select th:field="*{vehicleClass}" required>
-                        <option th:value="'Эконом'">Эконом</option>
-                        <option th:value="'Комфорт'">Комфорт</option>
-                        <option th:value="'Бизнес'">Бизнес</option>
-                        <option th:value="'Паркетник'">Паркетник</option>
-                        <option th:value="'Внедорожник'">Внедорожник</option>
-                        <option th:value="'Премиум'">Премиум</option>
-                    </select>
-                </div>
+                    <!-- Класс -->
+                    <div class="field">
+                        <label>Класс <span style="color: var(--danger);">*</span></label>
+                        <select th:field="*{vehicleClass}" required>
+                            <option value="" disabled>Выберите класс</option>
+                            <option th:value="'Эконом'">Эконом</option>
+                            <option th:value="'Комфорт'">Комфорт</option>
+                            <option th:value="'Бизнес'">Бизнес</option>
+                            <option th:value="'Паркетник'">Паркетник</option>
+                            <option th:value="'Внедорожник'">Внедорожник</option>
+                            <option th:value="'Премиум'">Премиум</option>
+                        </select>
+                    </div>
 
-                <!-- КПП (AT/MT) -->
-                <div>
-                    <label>КПП</label>
-                    <select th:field="*{transmission}" required>
-                        <option value="AT">AT</option>
-                        <option value="MT">MT</option>
-                    </select>
-                </div>
-
-                <!-- Год -->
-                <div>
-                    <label>Год</label>
-                    <input type="number" th:field="*{year}" min="1980" max="2100" required>
-                </div>
-
-                <!-- Цена -->
-                <div>
-                    <label>Цена, ₽/день</label>
-                    <input type="number" th:field="*{dailyPrice}" min="1" step="1" required>
-                </div>
-
-                <!-- Доступность -->
-                <div style="align-self:end;">
-                    <label style="display:flex; gap:8px; align-items:center;">
-                        <input type="checkbox" th:field="*{available}"> Доступен
-                    </label>
-                </div>
-
-                <!-- Каталог (enum/строка) -->
-                <div>
-                    <label>Каталог</label>
-                    <select th:field="*{catalog}" required>
-                        <option value="REGULAR">Обычный</option>
-                        <option value="TAXI">Такси</option>
-                        <option value="DELIVER">Доставка</option>
-                    </select>
-                </div>
-
-                <!-- Фото (URL) -->
-                <div>
-                    <label>Фото (URL)</label>
-                    <input th:field="*{photoUrl}" placeholder="/images/camry.png">
-                    <small class="text-muted">Положите файл в <code>static/images</code> и укажите путь вида <code>/images/имяфайла.png</code>.</small>
+                    <!-- КПП -->
+                    <div class="field">
+                        <label>Коробка передач <span style="color: var(--danger);">*</span></label>
+                        <select th:field="*{transmission}" required>
+                            <option value="" disabled>Выберите КПП</option>
+                            <option value="AT">Автоматическая (AT)</option>
+                            <option value="MT">Механическая (MT)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="form__actions">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button class="btn" type="submit">Сохранить</button>
-                <a class="btn btn--light" th:href="@{/admin/cars}">Отмена</a>
+            <!-- Технические характеристики -->
+            <div class="card" style="margin-bottom: var(--space-xl);">
+                <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border); color: var(--text-primary);">
+                    Технические характеристики
+                </h3>
+                <div class="form__grid">
+                    <!-- Год -->
+                    <div class="field">
+                        <label>Год выпуска <span style="color: var(--danger);">*</span></label>
+                        <input type="number" th:field="*{year}" min="1980" max="2100" required placeholder="2024">
+                        <small class="text-muted" style="display: block; margin-top: var(--space-xs);">
+                            Год должен быть между 1980 и 2100
+                        </small>
+                    </div>
+
+                    <!-- Цена -->
+                    <div class="field">
+                        <label>Цена аренды, ₽/день <span style="color: var(--danger);">*</span></label>
+                        <input type="number" th:field="*{dailyPrice}" min="1" step="1" required placeholder="5000">
+                        <small class="text-muted" style="display: block; margin-top: var(--space-xs);">
+                            Минимальная цена: 1 ₽
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Настройки и статус -->
+            <div class="card" style="margin-bottom: var(--space-xl);">
+                <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border); color: var(--text-primary);">
+                    Настройки и статус
+                </h3>
+                <div class="form__grid">
+                    <!-- Каталог -->
+                    <div class="field">
+                        <label>Каталог <span style="color: var(--danger);">*</span></label>
+                        <select th:field="*{catalog}" required>
+                            <option value="" disabled>Выберите каталог</option>
+                            <option value="REGULAR">Обычный</option>
+                            <option value="TAXI">Такси</option>
+                            <option value="DELIVERY">Доставка</option>
+                        </select>
+                        <small class="text-muted" style="display: block; margin-top: var(--space-xs);">
+                            Определяет, в каком каталоге будет отображаться автомобиль
+                        </small>
+                    </div>
+
+                    <!-- Доступность -->
+                    <div class="field" style="display: flex; align-items: flex-end;">
+                        <label class="checkbox-label-hover"
+                               style="display: flex; gap: var(--space-sm); align-items: center; cursor: pointer; padding: var(--space-md); border-radius: var(--radius-lg); border: 2px solid var(--border); width: 100%; transition: all var(--transition-base);">
+                            <input type="checkbox" th:field="*{available}" style="width: auto; margin: 0; cursor: pointer;">
+                            <span style="font-weight: 600; cursor: pointer;">Автомобиль доступен для аренды</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Изображение -->
+            <div class="card" style="margin-bottom: var(--space-xl);">
+                <h3 style="font-size: var(--font-size-lg); margin-bottom: var(--space-lg); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border); color: var(--text-primary);">
+                    Изображение
+                </h3>
+                <div class="field">
+                    <label>URL изображения</label>
+                    <input th:field="*{photoUrl}" placeholder="/images/camry.png" 
+                           style="font-family: 'Courier New', monospace;">
+                    <small class="text-muted" style="display: block; margin-top: var(--space-xs);">
+                        Положите файл в <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: var(--radius-sm);">static/images</code> 
+                        и укажите путь вида <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: var(--radius-sm);">/images/имяфайла.png</code>
+                    </small>
+                    <!-- Preview if image exists -->
+                    <div th:if="${car != null and car.photoUrl != null and !#strings.isEmpty(car.photoUrl)}" 
+                         style="margin-top: var(--space-md); padding: var(--space-md); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                        <img th:src="${(car.photoUrl.startsWith('http') or car.photoUrl.startsWith('/')) ? car.photoUrl : '/images/' + car.photoUrl}" 
+                             alt="Preview" 
+                             style="max-width: 100%; height: auto; border-radius: var(--radius-md);"
+                             onerror="this.style.display='none';">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="card">
+                <div class="form__actions">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button class="btn" type="submit">
+                        <span th:text="${car.id != null ? 'Сохранить изменения' : 'Создать автомобиль'}">Сохранить</span>
+                    </button>
+                    <a class="btn btn--light" th:href="@{/admin/cars}">Отмена</a>
+                </div>
             </div>
         </form>
 

@@ -6,7 +6,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="color-scheme" content="dark light"/>
-    <title th:text="${title} ?: 'CarRent'">CarRent</title>
+    <title th:text="${title} ?: 'Rentify'">Rentify</title>
 
     <!-- Fonts & Styles -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,10 +21,16 @@
         })();
     </script>
 </head>
-<body>
+<body th:classappend="${active}=='login' or ${active}=='register' ? ' auth-page' : ''">
+<div th:if="${active}=='login' or ${active}=='register'" class="auth-bg" aria-hidden="true">
+    <div class="auth-bg__layer auth-bg__layer--gradient"></div>
+    <div class="auth-bg__blob auth-bg__blob--1"></div>
+    <div class="auth-bg__blob auth-bg__blob--2"></div>
+    <div class="auth-bg__grid"></div>
+</div>
 <header class="site-header">
     <div class="container header__inner">
-        <a class="logo" th:href="@{/}">CarRent</a>
+        <a class="logo" th:href="@{/}">Rentify</a>
 
         <nav class="nav" aria-label="Главная навигация">
             <a th:classappend="${active}=='home' ? ' is-active' : ''" th:href="@{/}">Главная</a>
@@ -80,7 +86,7 @@
 
 <footer class="site-footer">
     <div class="container footer__inner">
-        <p>© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> CarRent</p>
+        <p>© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> Rentify</p>
         <nav class="footer-nav" aria-label="Навигация подвала">
             <a th:href="@{/about}">О нас</a>
             <a th:href="@{/cars}">Каталог</a>
@@ -90,10 +96,8 @@
     </div>
     <!-- Дополнительная информация и ссылки -->
     <div class="container footer-info">
-        <span>CarRent • Все права защищены</span>
-        <a th:href="@{/terms}">Правила бронирования</a>
-        <a th:href="@{/privacy}">Политика конфиденциальности</a>
-        <a th:href="@{/contacts}">Контакты</a>
+        <span>Rentify • Все права защищены</span>
+        <a th:href="@{/about}">Контакты</a>
     </div>
 </footer>
 
