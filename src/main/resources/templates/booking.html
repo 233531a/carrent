@@ -2,44 +2,59 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
         <div class="card">
-            <h2 class="page-title mt-0">Оформление заявки</h2>
+            <div style="margin-bottom: var(--space-xl);">
+                <h2 class="page-title mt-0">Оформление заявки</h2>
+                <p class="text-muted">Выберите автомобиль и укажите период аренды. Мы обработаем заявку в течение 15 минут.</p>
+            </div>
 
             <p class="alert alert--warn" th:if="${dateError}" th:text="${dateError}">Проверьте даты</p>
 
             <form id="bookingForm" class="form" th:action="@{/booking}" method="post" novalidate>
                 <div class="form__grid">
-                    <div>
-                        <label>Автомобиль</label>
+                    <div class="field">
+                        <label>🚗 Автомобиль</label>
                         <select id="carId" name="carId" class="form-select" required>
                             <option value="" disabled th:unless="${selectedCarId != null}" selected>Выберите автомобиль…</option>
                             <option th:each="c : ${cars}"
                                     th:value="${c.id}"
                                     th:selected="${selectedCarId != null} ? (c.id == selectedCarId) : false"
                                     th:attr="data-price=${c.dailyPrice}"
-                                    th:text="${c.make + ' ' + c.model + ' • ' + c.year}">
+                                    th:text="${c.make + ' ' + c.model + ' • ' + c.year + ' • ' + #numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT') + ' ₽/день'}">
                                 Авто
                             </option>
                         </select>
                         <small class="text-muted">Стоимость посуточная — возьмём из выбранного авто.</small>
                     </div>
 
-                    <div>
-                        <label>Дата начала</label>
+                    <div class="field">
+                        <label>📅 Дата начала</label>
                         <input id="startDate" class="form-control" type="date" name="startDate" required>
+                        <small class="text-muted">Не может быть в прошлом</small>
                     </div>
 
-                    <div>
-                        <label>Дата окончания</label>
+                    <div class="field">
+                        <label>📅 Дата окончания</label>
                         <input id="endDate" class="form-control" type="date" name="endDate" required>
+                        <small class="text-muted">Должна быть позже или равна дате начала</small>
                     </div>
                 </div>
 
-                <!-- Блок с итогами -->
-                <div class="card" style="margin-top: var(--space-md);">
-                    <div class="grid grid--3">
-                        <div><strong>Ставка:</strong> <span id="dailyPrice">—</span></div>
-                        <div><strong>Дней:</strong> <span id="daysCount">0</span></div>
-                        <div><strong>Итого:</strong> <span id="totalPrice">—</span></div>
+                <!-- Summary Block -->
+                <div class="card" style="margin-top: var(--space-xl); background: var(--bg-secondary); border: 2px solid var(--primary);">
+                    <h3 style="margin-bottom: var(--space-lg); color: var(--text-primary);">💰 Итоговая стоимость</h3>
+                    <div class="grid grid--3" style="margin-bottom: var(--space-md);">
+                        <div>
+                            <div class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-xs);">Ставка за день</div>
+                            <div style="font-size: var(--font-size-xl); font-weight: 700; color: var(--primary);" id="dailyPrice">—</div>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-xs);">Количество дней</div>
+                            <div style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary);" id="daysCount">0</div>
+                        </div>
+                        <div>
+                            <div class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-xs);">Итого к оплате</div>
+                            <div style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--primary);" id="totalPrice">—</div>
+                        </div>
                     </div>
                     <small class="text-muted">Итог считается как (включительно): (конец − начало) + 1 день.</small>
                 </div>

@@ -2,50 +2,70 @@
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
 
-        <nav class="crumbs" style="margin-bottom:12px;">
-            <a th:href="@{/cars}">Каталог</a><span>›</span>
+        <nav class="crumbs" style="margin-bottom: var(--space-lg);">
+            <a th:href="@{/cars}">Каталог</a>
+            <span>›</span>
             <span th:text="${car.make + ' ' + car.model}">Авто</span>
         </nav>
 
         <div class="card car-details">
-            <div class="img-skel shimmer big">
+            <div class="img-skel shimmer big" style="margin-bottom: var(--space-xl);">
                 <img
-                        th:src="${car != null and car.photoUrl != null and !#strings.isEmpty(car.photoUrl) ?
-              ((car.photoUrl.startsWith('http') or car.photoUrl.startsWith('/'))
-                  ? car.photoUrl
-                  : '/images/' + car.photoUrl)
-             : '/images/placeholder-car.jpg'}"
-                        alt=""
-                        onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+                    th:src="${car != null and car.photoUrl != null and !#strings.isEmpty(car.photoUrl) ?
+                      ((car.photoUrl.startsWith('http') or car.photoUrl.startsWith('/'))
+                          ? car.photoUrl
+                          : '/images/' + car.photoUrl)
+                     : '/images/placeholder-car.jpg'}"
+                    th:alt="${car.make + ' ' + car.model}"
+                    onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
             </div>
 
-
-            <h2 class="mt-0" th:text="${car.make + ' ' + car.model}">Название</h2>
-
-            <!-- Каталог (локализованный статус) + доступность -->
-            <div style="display:flex; gap: var(--space-sm); align-items:center; margin: var(--space-xs) 0 var(--space-lg);">
-                <span class="chip"
-                      th:text="${car.catalog == 'REGULAR' ? 'Обычный' : (car.catalog == 'TAXI' ? 'Такси' : (car.catalog == 'DELIVER' ? 'Доставка' : car.catalog))}">
-                    Обычный
-                </span>
-                <span class="badge"
-                      th:text="${car.available} ? 'Доступен' : 'Недоступен'"
-                      th:classappend="${car.available} ? ' text-bg-success' : ' text-bg-secondary'">Статус</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-lg); flex-wrap: wrap; gap: var(--space-md);">
+                <div>
+                    <h2 class="mt-0" th:text="${car.make + ' ' + car.model}">Название</h2>
+                    <div style="display: flex; gap: var(--space-sm); align-items: center; flex-wrap: wrap; margin-top: var(--space-sm);">
+                        <span class="chip"
+                              th:text="${car.catalog == 'REGULAR' ? 'Обычный' : (car.catalog == 'TAXI' ? 'Такси' : (car.catalog == 'DELIVER' ? 'Доставка' : car.catalog))}">
+                            Обычный
+                        </span>
+                        <span class="badge"
+                              th:classappend="${car.available} ? ' text-bg-success' : ' text-bg-secondary'"
+                              th:text="${car.available} ? 'Доступен' : 'Недоступен'">
+                            Статус
+                        </span>
+                    </div>
+                </div>
+                <div class="price" style="font-size: var(--font-size-3xl); text-align: right;"
+                     th:text="${#numbers.formatDecimal(car.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽/день'">
+                    0 ₽/день
+                </div>
             </div>
 
-            <div class="grid grid--2">
-                <ul class="spec" style="margin:0; padding-left:18px;">
-                    <li><strong>Класс:</strong> <span th:text="${car.vehicleClass}">economy</span></li>
-                    <li><strong>КПП:</strong> <span th:text="${car.transmission}">AT</span></li>
-                    <li><strong>Год:</strong> <span th:text="${car.year}">2024</span></li>
-                </ul>
+            <div class="grid grid--2" style="margin-bottom: var(--space-xl);">
+                <div>
+                    <h3 style="margin-bottom: var(--space-md); color: var(--text-primary);">Характеристики</h3>
+                    <ul class="spec">
+                        <li><strong>Класс:</strong> <span th:text="${car.vehicleClass}">economy</span></li>
+                        <li><strong>КПП:</strong> <span th:text="${car.transmission}">AT</span></li>
+                        <li><strong>Год:</strong> <span th:text="${car.year}">2024</span></li>
+                        <!-- Add more specs if available -->
+                        <!-- <li><strong>Двигатель:</strong> <span th:text="${car.engine}">2.0L</span></li> -->
+                        <!-- <li><strong>Мест:</strong> <span th:text="${car.seats}">5</span></li> -->
+                    </ul>
+                </div>
 
                 <div>
-                    <div class="price"
-                         th:text="${#numbers.formatDecimal(car.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽/день'">0 ₽/день</div>
-                    <div class="hero__actions" style="margin-top: var(--space-md);">
-                        <a class="btn" th:if="${car.available}" th:href="@{|/booking?carId=${car.id}|}">Арендовать</a>
-                        <a class="btn btn--light" th:href="@{/cars}">Назад</a>
+                    <h3 style="margin-bottom: var(--space-md); color: var(--text-primary);">Действия</h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+                        <a class="btn" 
+                           th:if="${car.available}" 
+                           th:href="@{|/booking?carId=${car.id}|}">
+                            Арендовать сейчас
+                        </a>
+                        <a class="btn btn--light" th:href="@{/cars}">← Вернуться в каталог</a>
+                        <div class="text-muted" style="font-size: var(--font-size-sm); padding: var(--space-md); background: var(--bg-secondary); border-radius: var(--radius-lg);">
+                            <strong>💡 Совет:</strong> Забронируйте автомобиль заранее, чтобы гарантировать его доступность на нужные даты.
+                        </div>
                     </div>
                 </div>
             </div>
