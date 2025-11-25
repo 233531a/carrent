@@ -74,8 +74,7 @@
                     </form>
                 </div>
                 <div sec:authorize="isAnonymous()" class="auth-group">
-                    <a class="btn-nav" th:href="@{/login}">Войти</a>
-                    <a class="btn-nav" th:href="@{/register}">Регистрация</a>
+                    <a class="btn-nav" th:href="@{/login}">Войти / Зарегистрироваться</a>
                 </div>
             </div>
         </div>
@@ -94,7 +93,6 @@
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Управление</a>
         </nav>
     </div>
-    <!-- Дополнительная информация и ссылки -->
     <div class="container footer-info">
         <span>Rentify • Все права защищены</span>
         <a th:href="@{/about}">Контакты</a>

@@ -1,66 +1,151 @@
-<th:block th:with="title='О нас', active='about'"
+<th:block th:with="title='Об авторе', active='about'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <div class="hero hero--gradient" style="min-height: 40vh; margin-bottom: var(--space-3xl);">
+        <!-- Hero Section -->
+        <section class="hero hero--gradient">
             <div class="hero__inner">
-                <div class="hero__content" style="text-align: center;">
-                    <h1 class="hero__title" data-reveal>О компании</h1>
-                    <p class="hero__description" data-reveal="fade-in">
-                        Мы делаем аренду авто простой, честной и удобной
+                <div class="hero__content">
+                    <h1 class="hero__title" data-reveal>Об авторе</h1>
+                    <p class="hero__description" data-reveal>
+                        Информация об авторе курсовой работы и технологиях, использованных в проекте
                     </p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="container">
-            <div class="grid grid--2" style="margin-bottom: var(--space-3xl);">
-                <div class="card card--hover" data-reveal>
-                    <h3 style="margin-bottom: var(--space-md);">Наша миссия</h3>
-                    <p>
-                        Мы делаем аренду авто простой, честной и удобной. Современный парк, 
-                        понятные условия и поддержка 24/7. Наша цель — предоставить вам лучший 
-                        сервис аренды автомобилей с прозрачными ценами и быстрой обработкой заявок.
-                    </p>
+        <section class="features">
+            <div class="container">
+                <div class="card author-card" data-reveal>
+                    <div class="author-header">
+                        <div class="author-avatar">👨‍💻</div>
+                        <div class="author-info">
+                            <h2 class="author-name">Емцов Андрей Сергеевич</h2>
+                            <p class="author-meta">Группа ПИ23-2 • Финансовый университет при Правительстве РФ</p>
+                        </div>
+                    </div>
+
+                    <div class="author-contacts">
+                        <div class="contact-item">
+                            <h3 class="contact-label">EMAIL</h3>
+                            <p class="contact-value">
+                                <a href="mailto:233531@edu.fa.ru">233531@edu.fa.ru</a>
+                            </p>
+                        </div>
+                        <div class="contact-item">
+                            <h3 class="contact-label">ТЕЛЕФОН</h3>
+                            <p class="contact-value">
+                                <a href="tel:+79001234567">+7 (915) 057-04-51</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card card--hover" data-reveal>
-                    <h3 style="margin-bottom: var(--space-md);">Корпоративным клиентам</h3>
-                    <p>
-                        Корпоративным клиентам — персональные условия и отчётные документы. 
-                        Мы предлагаем специальные тарифы для бизнеса с гибкими условиями 
-                        оплаты и индивидуальным подходом к каждому клиенту.
-                    </p>
+
+                <h2 class="section-title" data-reveal>Этапы работы над проектом</h2>
+                <div class="card timeline-grid" data-reveal>
+                    <div class="timeline-item timeline-item--primary">
+                        <h4 class="timeline-title">📅 Начало проекта</h4>
+                        <p class="timeline-date">21 Октября 2025</p>
+                    </div>
+                    <div class="timeline-item timeline-item--accent">
+                        <h4 class="timeline-title">🔧 Разработка</h4>
+                        <p class="timeline-date">22 октября - 11 ноября 2025</p>
+                    </div>
+                    <div class="timeline-item timeline-item--secondary">
+                        <h4 class="timeline-title">🧪 Тестирование</h4>
+                        <p class="timeline-date">Ноябрь 2025</p>
+                    </div>
+                    <div class="timeline-item timeline-item--success">
+                        <h4 class="timeline-title">✅ Завершение</h4>
+                        <p class="timeline-date">Декабрь 2025</p>
+                    </div>
+                </div>
+
+                <h2 class="section-title" data-reveal>Опыт работы с технологиями</h2>
+                <p class="section-description" data-reveal>
+                    В процессе создания проекта были использованы современные технологии веб-разработки и Java-экосистемы.
+                    Приобретён опыт в построении многоуровневой архитектуры, работе с базами данных,
+                    реализации безопасности и создании адаптивных пользовательских интерфейсов.
+                </p>
+
+                <div class="grid grid--3">
+                    <div class="card tech-card" data-reveal>
+                        <h3 class="tech-card__title">Backend</h3>
+                        <ul class="tech-list">
+                            <li class="tech-item">
+                                <strong>Java</strong> — язык разработки
+                            </li>
+                            <li class="tech-item">
+                                <strong>Spring Boot</strong> — фреймворк
+                            </li>
+                            <li class="tech-item">
+                                <strong>Spring Security</strong> — безопасность
+                            </li>
+                            <li class="tech-item tech-item--last">
+                                <strong>Hibernate JPA</strong> — ORM
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card tech-card" data-reveal>
+                        <h3 class="tech-card__title">Frontend</h3>
+                        <ul class="tech-list">
+                            <li class="tech-item">
+                                <strong>HTML</strong> — семантическая разметка
+                            </li>
+                            <li class="tech-item">
+                                <strong>CSS</strong> — адаптивный дизайн
+                            </li>
+                            <li class="tech-item">
+                                <strong>JavaScript</strong> — интерактивность
+                            </li>
+                            <li class="tech-item tech-item--last">
+                                <strong>Thymeleaf</strong> — шаблонизатор
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card tech-card" data-reveal>
+                        <h3 class="tech-card__title">Инструменты</h3>
+                        <ul class="tech-list">
+                            <li class="tech-item">
+                                <strong>MySQL</strong> — база данных
+                            </li>
+                            <li class="tech-item">
+                                <strong>Maven</strong> — управление зависимостями
+                            </li>
+                            <li class="tech-item">
+                                <strong>Git</strong> — контроль версий
+                            </li>
+                            <li class="tech-item tech-item--last">
+                                <strong>REST API</strong> — архитектура
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <section class="info-section">
-                <h2 class="section-title" data-reveal>Наши преимущества</h2>
-                <div class="info-grid">
-                    <div class="info-card info-card--fade-in" data-reveal>
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚗</div>
-                        <h3>Современный парк</h3>
-                        <p>Автомобили различных классов от проверенных производителей. Все машины регулярно проходят техническое обслуживание.</p>
+        <section class="info-section">
+            <div class="container">
+                <h2 class="section-title" data-reveal>Статистика проекта</h2>
+                <div class="card stats-grid" data-reveal>
+                    <div class="stat-item">
+                        <div class="stat-value stat-value--primary">1000+</div>
+                        <div class="stat-label">строк кода Java</div>
                     </div>
-                    <div class="info-card info-card--fade-in" data-reveal>
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚡</div>
-                        <h3>Быстрая обработка</h3>
-                        <p>Одобрение заявок в течение 15 минут. Минимум документов и максимум удобства для наших клиентов.</p>
+                    <div class="stat-item">
+                        <div class="stat-value stat-value--secondary">6</div>
+                        <div class="stat-label">сущностей в БД</div>
                     </div>
-                    <div class="info-card info-card--fade-in" data-reveal>
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🛡️</div>
-                        <h3>Полная защита</h3>
-                        <p>КАСКО и ОСАГО включены в стоимость. Круглосуточная поддержка на случай любых вопросов или проблем.</p>
-                    </div>
-                    <div class="info-card info-card--fade-in" data-reveal>
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
-                        <h3>Удобный сервис</h3>
-                        <p>Отслеживание статуса заявки в реальном времени. Вся информация в личном кабинете доступна 24/7.</p>
+                    <div class="stat-item">
+                        <div class="stat-value stat-value--success">5</div>
+                        <div class="stat-label">ролей пользователей</div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
 
         <script>
-            // Intersection Observer for reveal animations
             (function() {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {

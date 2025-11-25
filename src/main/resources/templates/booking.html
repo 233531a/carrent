@@ -28,18 +28,19 @@
 
                     <div class="field">
                         <label>📅 Дата начала</label>
-                        <input id="startDate" class="form-control" type="date" name="startDate" required>
+                        <input id="startDate" class="form-control" type="date" name="startDate" 
+                               th:value="${startDate}" required>
                         <small class="text-muted">Не может быть в прошлом</small>
                     </div>
 
                     <div class="field">
                         <label>📅 Дата окончания</label>
-                        <input id="endDate" class="form-control" type="date" name="endDate" required>
+                        <input id="endDate" class="form-control" type="date" name="endDate" 
+                               th:value="${endDate}" required>
                         <small class="text-muted">Должна быть позже или равна дате начала</small>
                     </div>
                 </div>
 
-                <!-- Summary Block -->
                 <div class="card" style="margin-top: var(--space-xl); background: var(--bg-secondary); border: 2px solid var(--primary);">
                     <h3 style="margin-bottom: var(--space-lg); color: var(--text-primary);">💰 Итоговая стоимость</h3>
                     <div class="grid grid--3" style="margin-bottom: var(--space-md);">
@@ -80,10 +81,12 @@
 
                 const fmt = new Intl.NumberFormat('ru-RU');
 
-                // min=today
                 const today = new Date(); today.setHours(0,0,0,0);
                 const toISO = d => d.toISOString().slice(0,10);
                 s.min = e.min = toISO(today);
+
+                let selectedCarId = null;
+                let updateTimeout = null;
 
                 function getDailyPrice(){
                     const opt = sel && sel.options[sel.selectedIndex];
@@ -97,21 +100,77 @@
                 function diffDaysInclusive(sd, ed){
                     const msPerDay = 24*60*60*1000;
                     const diff = Math.round((ed - sd)/msPerDay);
-                    return diff + 1; // включительно
+                    return diff + 1;
                 }
 
-                function showMsg(text){
-                    let alert = form.querySelector('.alert.alert--warn.calc');
+                function showMsg(text, type = 'warn'){
+                    let alert = form.querySelector('.alert.alert--' + type + '.calc');
                     if(!alert) {
                         alert = document.createElement('p');
-                        alert.className = 'alert alert--warn calc';
+                        alert.className = 'alert alert--' + type + ' calc';
                         form.insertBefore(alert, form.firstElementChild.nextElementSibling);
                     }
                     alert.textContent = text;
                 }
                 function clearMsg(){
-                    const a = form.querySelector('.alert.alert--warn.calc');
-                    if(a) a.remove();
+                    const alerts = form.querySelectorAll('.alert.calc');
+                    alerts.forEach(a => a.remove());
+                }
+
+                function updateCarList(){
+                    if(updateTimeout) clearTimeout(updateTimeout);
+                    
+                    const sd = s.value;
+                    const ed = e.value;
+                    
+                    if(sel && sel.value) {
+                        selectedCarId = sel.value;
+                    }
+                    
+                    if(sd && ed) {
+                        const sdDate = new Date(sd);
+                        const edDate = new Date(ed);
+                        sdDate.setHours(0,0,0,0);
+                        edDate.setHours(0,0,0,0);
+                        
+                        if(sdDate >= today && edDate >= sdDate) {
+                            updateTimeout = setTimeout(() => {
+                                fetch('/booking/api/available-cars?startDate=' + sd + '&endDate=' + ed)
+                                    .then(response => response.json())
+                                    .then(cars => {
+                                        const currentValue = sel.value;
+                                        
+                                        sel.innerHTML = '<option value="" disabled selected>Выберите автомобиль…</option>';
+                                        
+                                        cars.forEach(car => {
+                                            const option = document.createElement('option');
+                                            option.value = car.id;
+                                            option.setAttribute('data-price', car.pricePerDay);
+                                            option.textContent = car.brand + ' ' + car.model + ' • ' + car.year + 
+                                                ' • ' + fmt.format(car.pricePerDay) + ' ₽/день';
+                                            sel.appendChild(option);
+                                        });
+                                        
+                                        if(currentValue && cars.some(c => c.id == currentValue)) {
+                                            sel.value = currentValue;
+                                        } else if(selectedCarId && cars.some(c => c.id == selectedCarId)) {
+                                            sel.value = selectedCarId;
+                                        } else {
+                                            selectedCarId = null;
+                                        }
+                                        
+                                        recalc();
+                                        
+                                        if(cars.length === 0) {
+                                            showMsg('На выбранные даты нет доступных автомобилей. Пожалуйста, выберите другой период.', 'warn');
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error('Ошибка при загрузке списка автомобилей:', err);
+                                    });
+                            }, 300);
+                        }
+                    }
                 }
 
                 function recalc(){
@@ -123,14 +182,17 @@
                     if(sd) sd.setHours(0,0,0,0);
                     if(ed) ed.setHours(0,0,0,0);
 
-                    // отрисовать ставку
                     elDaily.textContent = (dp != null) ? (fmt.format(dp) + ' ₽/день') : '—';
 
-                    // валидация дат
-                    if(sd && sd < today){ showMsg('Дата начала не может быть в прошлом.'); }
-                    if(sd && ed && ed < sd){ showMsg('Дата окончания должна быть позже или равна дате начала.'); }
+                    if(sd && sd < today){ 
+                        showMsg('Дата начала не может быть в прошлом.'); 
+                        return;
+                    }
+                    if(sd && ed && ed < sd){ 
+                        showMsg('Дата окончания должна быть позже или равна дате начала.'); 
+                        return;
+                    }
 
-                    // пересчитать дни/итого
                     if(dp != null && sd && ed && ed >= sd){
                         const days = diffDaysInclusive(sd, ed);
                         const total = dp * days;
@@ -142,29 +204,51 @@
                     }
                 }
 
-                // связать ограничения
                 s.addEventListener('change', ()=>{
                     e.min = s.value || e.min;
                     recalc();
+                    updateCarList();
                 });
-                e.addEventListener('change', recalc);
+                e.addEventListener('change', ()=>{
+                    recalc();
+                    updateCarList();
+                });
                 if(sel) sel.addEventListener('change', recalc);
 
-                // финальная проверка при submit
                 form.addEventListener('submit', (ev)=>{
                     clearMsg();
                     const dp = getDailyPrice();
-                    if(!sel || !sel.value){ showMsg('Выберите автомобиль.'); ev.preventDefault(); return; }
+                    if(!sel || !sel.value){ 
+                        showMsg('Выберите автомобиль.'); 
+                        ev.preventDefault(); 
+                        return; 
+                    }
                     const sd = s.value ? new Date(s.value) : null;
                     const ed = e.value ? new Date(e.value) : null;
-                    if(!sd || !ed){ showMsg('Заполните обе даты.'); ev.preventDefault(); return; }
-                    sd.setHours(0,0,0,0); ed.setHours(0,0,0,0);
-                    if(sd < today){ showMsg('Дата начала не может быть в прошлом.'); ev.preventDefault(); return; }
-                    if(ed < sd){ showMsg('Дата окончания должна быть позже или равна дате начала.'); ev.preventDefault(); return; }
-                    if(dp == null){ showMsg('Для выбранного авто не найдена ставка.'); ev.preventDefault(); return; }
+                    if(!sd || !ed){ 
+                        showMsg('Заполните обе даты.'); 
+                        ev.preventDefault(); 
+                        return; 
+                    }
+                    sd.setHours(0,0,0,0); 
+                    ed.setHours(0,0,0,0);
+                    if(sd < today){ 
+                        showMsg('Дата начала не может быть в прошлом.'); 
+                        ev.preventDefault(); 
+                        return; 
+                    }
+                    if(ed < sd){ 
+                        showMsg('Дата окончания должна быть позже или равна дате начала.'); 
+                        ev.preventDefault(); 
+                        return; 
+                    }
+                    if(dp == null){ 
+                        showMsg('Для выбранного авто не найдена ставка.'); 
+                        ev.preventDefault(); 
+                        return; 
+                    }
                 });
 
-                // начальный расчёт, если selectedCarId уже выбран на сервере
                 recalc();
             })();
         </script>

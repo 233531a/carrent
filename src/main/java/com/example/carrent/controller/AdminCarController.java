@@ -11,6 +11,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Контроллер для управления автомобилями администратором.
+ *
+ * Предоставляет CRUD операции для автомобилей:
+ * - Просмотр списка всех автомобилей
+ * - Создание нового автомобиля
+ * - Редактирование существующего автомобиля
+ * - Удаление автомобиля
+ *
+ * Доступен только пользователям с ролью ADMIN.
+ *
+ * @author Система аренды автомобилей
+ * @version 1.0
+ * @since 2025-01-25
+ */
 @Controller
 @RequestMapping("/admin/cars")
 @PreAuthorize("hasRole('ADMIN')")
@@ -25,7 +40,7 @@ public class AdminCarController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("cars", carRepo.findAll());
-        return "admin-cars"; // templates/admin-cars.html
+        return "admin-cars";
     }
 
     @GetMapping("/new")
@@ -34,7 +49,7 @@ public class AdminCarController {
         car.setAvailable(true);
         model.addAttribute("car", car);
         model.addAttribute("titleForm", "Добавить автомобиль");
-        return "admin-car-form"; // templates/admin-car-form.html
+        return "admin-car-form";
     }
 
     @PostMapping

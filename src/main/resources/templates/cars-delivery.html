@@ -3,7 +3,6 @@
           xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <th:block th:fragment="content">
 
-        <!-- Инфо-блок для режимов -->
         <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom: var(--space-md);">
             <span class="chip"
                   th:text="${mode == 'taxi' ? 'Спец-подборка для такси'
@@ -13,7 +12,6 @@
 
         <h2 class="page-title">Каталог автомобилей для доставки</h2>
 
-        <!-- Фильтры: полный набор -->
         <form class="card form form--filters filters-v2" th:action="@{/cars/delivery}" method="get">
             <div class="filters-v2__bar">
                 <button class="btn btn--sm" type="submit">Фильтр</button>
@@ -59,7 +57,6 @@
             </div>
         </form>
 
-        <!-- Карточки -->
         <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
             <article class="card car car--v2 card--hover" th:each="c : ${cars}">
                 <div class="car__media">
@@ -75,21 +72,18 @@
                     </div>
                 </div>
 
-                <!-- Заголовок + доступность -->
                 <div class="car__head">
                     <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
                     <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
                           th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
                 </div>
 
-                <!-- Характеристики -->
                 <p class="text-muted">
                     <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
                     <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
                     <span th:text="'Год: ' + ${c.year}">Year</span>
                 </p>
 
-                <!-- Цена + действия -->
                 <div class="car__price">
                     <div class="price"
                          th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>

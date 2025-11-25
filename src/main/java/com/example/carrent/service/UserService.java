@@ -11,13 +11,49 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Сервис для управления пользователями.
+ *
+ * Предоставляет бизнес-логику для:
+ * - Регистрации новых пользователей (клиентов)
+ * - Создания сотрудников, менеджеров и администраторов
+ * - Управления профилями клиентов
+ *
+ * @author Система аренды автомобилей
+ * @version 1.0
+ * @since 2025-01-25
+ */
 @Service
 public class UserService {
+
+    /**
+     * Репозиторий для работы с пользователями.
+     */
     private final UserRepository userRepo;
+
+    /**
+     * Репозиторий для работы с ролями.
+     */
     private final RoleRepository roleRepo;
+
+    /**
+     * Репозиторий для работы с профилями клиентов.
+     */
     private final CustomerRepository customerRepo;
+
+    /**
+     * Кодировщик паролей (BCrypt).
+     */
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Конструктор с внедрением зависимостей.
+     *
+     * @param userRepo репозиторий пользователей
+     * @param roleRepo репозиторий ролей
+     * @param customerRepo репозиторий клиентов
+     * @param passwordEncoder кодировщик паролей
+     */
     public UserService(UserRepository userRepo,
                        RoleRepository roleRepo,
                        CustomerRepository customerRepo,
@@ -28,6 +64,19 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Зарегистрировать нового пользователя (клиента).
+     *
+     * Процесс регистрации:
+     * 1. Проверка уникальности логина
+     * 2. Проверка совпадения паролей
+     * 3. Создание пользователя с зашифрованным паролем
+     * 4. Назначение роли ROLE_CLIENT
+     * 5. Создание профиля клиента
+     *
+     * @param form форма регистрации с данными пользователя
+     * @throws IllegalArgumentException если логин уже занят или пароли не совпадают
+     */
     @Transactional
     public void register(RegistrationForm form) {
         if (userRepo.existsByUsername(form.getUsername())) {
@@ -42,32 +91,14 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.setEnabled(true);
 
-        // По умолчанию регистрируем как клиента
         Role clientRole = roleRepo.findByName(Role.ROLE_CLIENT)
                 .orElseGet(() -> roleRepo.save(new Role(Role.ROLE_CLIENT)));
         user.addRole(clientRole);
 
         user = userRepo.save(user);
 
-        // Создаём профиль клиента
         Customer customer = new Customer();
         customer.setUser(user);
-        customer.setFullName(form.getUsername());
         customerRepo.save(customer);
-    }
-
-    /** Создание сотрудника (EMPLOYEE, MANAGER или ADMIN) вручную */
-    @Transactional
-    public User createEmployee(String username, String rawPassword, String roleName) {
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(rawPassword));
-        user.setEnabled(true);
-
-        Role role = roleRepo.findByName(roleName)
-                .orElseGet(() -> roleRepo.save(new Role(roleName)));
-        user.addRole(role);
-
-        return userRepo.save(user);
     }
 }

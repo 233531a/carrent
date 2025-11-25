@@ -3,7 +3,6 @@
           xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <th:block th:fragment="content">
 
-        <!-- Info banner for special modes -->
         <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--primary);">
             <div style="display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;">
                 <span class="chip" 
@@ -25,7 +24,6 @@
             </div>
         </div>
 
-        <!-- Filters: regular mode -->
         <form class="card form form--filters" th:action="@{/cars}" method="get"
               th:if="${mode == null or mode == 'regular'}" style="margin-bottom: var(--space-xl);">
             <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md);">
@@ -71,7 +69,6 @@
             </div>
         </form>
 
-        <!-- Sort for special modes -->
         <form class="card form" method="get"
               th:if="${mode != null and mode != 'regular'}"
               th:action="@{${#httpServletRequest.requestURI}}"
@@ -90,7 +87,6 @@
             </div>
         </form>
 
-        <!-- Car Cards -->
         <div class="scroller" th:if="${#lists.size(cars) > 0}">
             <article class="car-card" th:each="c : ${cars}" data-reveal>
                 <a class="car-card__media" th:href="@{/cars/{id}(id=${c.id})}">
@@ -148,7 +144,6 @@
         </div>
 
         <script>
-            // Intersection Observer for reveal animations
             (function() {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {

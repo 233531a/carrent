@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Аренда/бронирование автомобиля.
+ * Здесь фиксируем: кто взял, какую машину, на какие даты и за сколько.
+ */
 @Entity
 @Table(name = "rentals")
 public class Rental {
@@ -13,54 +17,63 @@ public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Связи
+    // --------- Связи ---------
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "car_id", nullable = false)
-    private Car car;
+    private Car car;             // какую машину арендовали
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    private Customer customer;   // кто арендовал
 
-    // Даты
+    // --------- Даты аренды ---------
+
     @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    private LocalDate startDate; // начало аренды
 
     @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    private LocalDate endDate;   // конец аренды
 
-    // Статус (как строка)
+    // --------- Статус аренды ---------
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20 /*, columnDefinition = "varchar(20)"*/)
-    private RentalStatus status = RentalStatus.PENDING;
+    @Column(name = "status", nullable = false, length = 20)
+    private RentalStatus status = RentalStatus.PENDING; // по умолчанию — "ожидание"
 
-    // Денежные поля
+    // --------- Денежные поля ---------
+
     @Column(name = "price_per_day", nullable = false, precision = 10, scale = 2)
-    private BigDecimal pricePerDay; // будет копией car.daily_price на момент брони
+    private BigDecimal pricePerDay;     // цена за день на момент брони
 
     @Column(name = "days_count", nullable = false)
-    private Integer daysCount;
+    private Integer daysCount;          // сколько дней аренды
 
     @Column(name = "total_amount", precision = 19, scale = 2, nullable = false)
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount;     // итоговая сумма
 
-    // Таймстампы
+    // --------- Таймстемпы ---------
+
     @Column(name = "created_at", nullable = false)
     private java.time.LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private java.time.LocalDateTime updatedAt;
 
-    public Rental() {}
+    public Rental() {
+    }
 
-    // ====== Логика автозаполнения ======
+    // =====================================================================
+    // Жизненный цикл сущности: перед вставкой и перед обновлением
+    // =====================================================================
+
     @PrePersist
     public void prePersist() {
         validateDates();
         this.createdAt = java.time.LocalDateTime.now();
         this.updatedAt = this.createdAt;
 
-        // если не проставлены — рассчитать
+        // если цену/дни не передали — посчитаем сами
         if (this.pricePerDay == null && this.car != null) {
             this.pricePerDay = this.car.getDailyPrice();
         }
@@ -82,20 +95,25 @@ public class Rental {
         validateDates();
         this.updatedAt = java.time.LocalDateTime.now();
 
-        // пересчёт при изменении дат/цены
+        // если поменяли даты — пересчитаем кол-во дней
         if (this.startDate != null && this.endDate != null) {
             long days = ChronoUnit.DAYS.between(this.startDate, this.endDate) + 1;
             if (days <= 0) throw new IllegalArgumentException("Диапазон дат некорректен");
             this.daysCount = (int) days;
         }
+        // если цену не задали явно — возьмём из машины
         if (this.pricePerDay == null && this.car != null) {
             this.pricePerDay = this.car.getDailyPrice();
         }
+        // финальный пересчёт суммы
         if (this.pricePerDay != null && this.daysCount != null) {
             this.totalAmount = this.pricePerDay.multiply(BigDecimal.valueOf(this.daysCount));
         }
     }
 
+    /**
+     * Проверка, что даты заполнены и конец не раньше начала.
+     */
     private void validateDates() {
         if (this.startDate == null || this.endDate == null) {
             throw new IllegalArgumentException("Даты бронирования обязательны");
@@ -105,7 +123,8 @@ public class Rental {
         }
     }
 
-    // ====== getters / setters ======
+    // --------- Getters / Setters ---------
+
     public Long getId() { return id; }
     public Car getCar() { return car; }
     public Customer getCustomer() { return customer; }

@@ -5,6 +5,8 @@ import com.example.carrent.model.RentalStatus;
 import com.example.carrent.repository.RentalRepository;
 import com.example.carrent.service.BookingService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+/**
+ * Контроллер для панели менеджера.
+ *
+ * Предоставляет функции управления бронированиями:
+ * - Просмотр всех бронирований с фильтрацией по статусу
+ * - Поиск бронирований по клиенту, автомобилю или ID
+ * - Одобрение заявок (PENDING → ACTIVE)
+ * - Отклонение заявок (PENDING → REJECTED)
+ * - Завершение аренд (ACTIVE → COMPLETED)
+ *
+ * Доступен пользователям с ролями MANAGER или ADMIN.
+ *
+ * @author Система аренды автомобилей
+ * @version 1.0
+ * @since 2025-01-25
+ */
 @Controller
 @RequestMapping("/manager")
 @PreAuthorize("hasAnyRole('MANAGER','ADMIN')")
@@ -64,24 +82,25 @@ public class ManagerController {
         model.addAttribute("rentals", list);
         model.addAttribute("status", status.orElse("ALL"));
         model.addAttribute("q", q.orElse(""));
-        return "manager"; // templates/manager/index.html
+        return "manager";
     }
 
     @PostMapping("/rentals/{id}/approve")
     public String approve(@PathVariable Long id) {
-        bookingService.approveByManager(id);
+        bookingService.approve(id);
         return "redirect:/manager/rentals?status=ALL&ok=" + id;
     }
 
     @PostMapping("/rentals/{id}/reject")
-    public String reject(@PathVariable Long id) {
-        bookingService.rejectByManager(id);
+    public String reject(@PathVariable Long id,
+                         @AuthenticationPrincipal UserDetails principal) {
+        bookingService.reject(id, principal.getUsername());
         return "redirect:/manager/rentals?status=ALL&rejected=" + id;
     }
 
     @PostMapping("/rentals/{id}/complete")
     public String complete(@PathVariable Long id) {
-        bookingService.completeByManager(id);
+        bookingService.complete(id);
         return "redirect:/manager/rentals?status=ALL&completed=" + id;
     }
 }

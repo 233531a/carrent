@@ -9,17 +9,13 @@
                     <p class="auth-subtitle-simple">Создайте аккаунт, чтобы арендовать автомобиль</p>
                 </div>
 
-                <!-- Error message from server -->
                 <div class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка регистрации</div>
 
-                <!-- Success message (if redirected from somewhere) -->
                 <div class="alert alert--success" th:if="${success}" th:text="${success}"></div>
 
                 <form th:action="@{/register}" method="post" th:object="${form}" class="form-simple" id="registerForm">
-                    <!-- CSRF token (if needed) -->
                     <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
 
-                    <!-- Username field -->
                     <div class="field-simple">
                         <span>👤 Логин</span>
                         <input type="text" name="username" placeholder="Минимум 3 символа" 
@@ -27,7 +23,6 @@
                         <div class="hint-simple text-muted" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                     </div>
 
-                    <!-- Password field -->
                     <div class="field-simple">
                         <span>🔒 Пароль</span>
                         <div class="field-simple__pass">
@@ -40,7 +35,6 @@
                         <div class="hint-simple text-muted">Используйте минимум 6 символов</div>
                     </div>
 
-                    <!-- Confirm Password field -->
                     <div class="field-simple">
                         <span>🔒 Подтвердите пароль</span>
                         <div class="field-simple__pass">
@@ -80,7 +74,6 @@
                 }
             }
 
-            // Password match validation
             (function() {
                 const password = document.getElementById('password');
                 const confirmPassword = document.getElementById('confirmPassword');
@@ -109,7 +102,6 @@
                 confirmPassword.addEventListener('input', checkMatch);
             })();
 
-            // Reveal animation
             (function() {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {

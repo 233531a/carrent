@@ -10,10 +10,27 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Контроллер для работы с каталогами автомобилей.
+ *
+ * Обрабатывает запросы к различным каталогам:
+ * - /cars - обычный каталог (REGULAR), доступен всем
+ * - /cars/taxi - каталог такси (TAXI), только для сотрудников
+ * - /cars/delivery - каталог доставки (DELIVERY), только для сотрудников
+ * - /cars/{id} - детали конкретного автомобиля
+ *
+ * Поддерживает фильтрацию и сортировку автомобилей.
+ *
+ * @author Система аренды автомобилей
+ * @version 1.0
+ * @since 2025-01-25
+ */
 @Controller
 public class CarController {
 
@@ -23,7 +40,6 @@ public class CarController {
         this.carRepo = carRepo;
     }
 
-    // ====== ОБЩИЙ КАТАЛОГ (REGULAR) ======
     @GetMapping("/cars")
     public String list(@RequestParam(required = false) String q,
                        @RequestParam(required = false) String vehicleClass,
@@ -32,7 +48,7 @@ public class CarController {
                        @RequestParam(required = false) String sort,
                        Model model) {
 
-        List<Car> cars = carRepo.findByCatalog(CatalogType.REGULAR); // <-- ключевое отличие
+        List<Car> cars = carRepo.findByCatalog(CatalogType.REGULAR);
 
         String qq = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
         String vc = vehicleClass == null ? "" : vehicleClass.trim().toLowerCase(Locale.ROOT);
@@ -73,7 +89,6 @@ public class CarController {
         return "cars";
     }
 
-    // ====== ТАКСИ (TAXI) ======
     @GetMapping("/cars/taxi")
     public String taxiCatalog(@RequestParam(required = false) String q,
                               @RequestParam(required = false) String vehicleClass,
@@ -123,7 +138,6 @@ public class CarController {
         return "cars-taxi";
     }
 
-    // ====== ДОСТАВКА (DELIVERY) ======
     @GetMapping("/cars/delivery")
     public String deliveryCatalog(@RequestParam(required = false) String q,
                                   @RequestParam(required = false) String vehicleClass,
@@ -174,7 +188,6 @@ public class CarController {
     }
 
 
-    // ====== ДЕТАЛИ ======
     @GetMapping("/cars/{id}")
     public String details(@PathVariable Long id, Model model) {
         Car car = carRepo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

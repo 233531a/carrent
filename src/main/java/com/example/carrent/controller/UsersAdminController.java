@@ -15,6 +15,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Контроллер для управления пользователями администратором.
+ *
+ * Предоставляет функции:
+ * - Просмотр списка всех пользователей с поиском
+ * - Изменение ролей пользователей
+ * - Удаление пользователей (с каскадным удалением связанных данных)
+ *
+ * Доступен только пользователям с ролью ADMIN.
+ *
+ * @author Система аренды автомобилей
+ * @version 1.0
+ * @since 2025-01-25
+ */
 @Controller
 @RequestMapping("/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
@@ -22,7 +36,7 @@ public class UsersAdminController {
 
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
-    private final AdminUserService adminUserService; // <-- добавили
+    private final AdminUserService adminUserService;
 
     public UsersAdminController(UserRepository userRepo,
                                 RoleRepository roleRepo,
@@ -72,7 +86,7 @@ public class UsersAdminController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
-        adminUserService.deleteUserHard(id); // <-- используем сервис
+        adminUserService.deleteUserHard(id);
         ra.addFlashAttribute("msg", "Пользователь удалён (ID: " + id + ")");
         return "redirect:/admin/users";
     }

@@ -38,23 +38,17 @@
                     <td style="text-align:right; white-space:nowrap;"
                         th:text="${#numbers.formatDecimal(c.dailyPrice,0,'COMMA',0,'POINT')} + ' ₽'">2 500 ₽</td>
 
-                    <!-- Каталог -->
                     <td>
                         <span class="badge"
-                              th:text="${
-                                c.catalog == T(com.example.carrent.model.CatalogType).REGULAR ? 'Обычный' :
-                                (c.catalog == T(com.example.carrent.model.CatalogType).TAXI ? 'Такси' : 'Доставка')
-                              }">Обычный</span>
+                              th:text="${c.catalog.name() == 'REGULAR' ? 'Обычный' : (c.catalog.name() == 'TAXI' ? 'Такси' : 'Доставка')}">Обычный</span>
                     </td>
 
-                    <!-- Доступность -->
                     <td>
                         <span class="badge"
                               th:classappend="${c.available} ? ' text-bg-success' : ' text-bg-secondary'"
                               th:text="${c.available} ? 'Доступен' : 'Недоступен'">Доступен</span>
                     </td>
 
-                    <!-- Действия -->
                     <td style="text-align:center; white-space:nowrap;">
                         <div class="btn-group">
                             <a class="btn btn--light btn--sm" th:href="@{|/admin/cars/${c.id}/edit|}">Изм.</a>
