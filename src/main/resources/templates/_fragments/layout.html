@@ -30,9 +30,12 @@
 </div>
 <header class="site-header">
     <div class="container header__inner">
+        <button class="header__burger" id="navToggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+            ☰
+        </button>
         <a class="logo" th:href="@{/}">Rentify</a>
 
-        <nav class="nav" aria-label="Главная навигация">
+        <nav class="nav" id="mainNav" aria-label="Главная навигация">
             <a th:classappend="${active}=='home' ? ' is-active' : ''" th:href="@{/}">Главная</a>
 
             <details class="nav__dropdown" th:classappend="${active}=='cars' ? ' is-active' : ''">
@@ -101,20 +104,68 @@
 
 <script>
     (function () {
+        // Theme toggle
         const btn = document.getElementById('themeBtn');
-        if (!btn) return;
-        const root = document.documentElement;
-        const sync = () => {
-            const light = root.classList.contains('theme-light');
-            btn.textContent = light ? '☀️' : '🌙';
-            btn.setAttribute('aria-label', light ? 'Переключить на тёмную' : 'Переключить на светлую');
-        };
-        sync();
-        btn.addEventListener('click', () => {
-            root.classList.toggle('theme-light');
-            localStorage.setItem('theme', root.classList.contains('theme-light') ? 'light' : 'dark');
+        if (btn) {
+            const root = document.documentElement;
+            const sync = () => {
+                const light = root.classList.contains('theme-light');
+                btn.textContent = light ? '☀️' : '🌙';
+                btn.setAttribute('aria-label', light ? 'Переключить на тёмную' : 'Переключить на светлую');
+            };
             sync();
-        });
+            btn.addEventListener('click', () => {
+                root.classList.toggle('theme-light');
+                localStorage.setItem('theme', root.classList.contains('theme-light') ? 'light' : 'dark');
+                sync();
+            });
+        }
+        
+        // Mobile menu toggle
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+        const body = document.body;
+        
+        if (navToggle && mainNav) {
+            navToggle.addEventListener('click', () => {
+                const isOpen = body.classList.toggle('nav-open');
+                navToggle.setAttribute('aria-expanded', isOpen);
+                navToggle.textContent = isOpen ? '✕' : '☰';
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (body.classList.contains('nav-open') && !mainNav.contains(e.target) && !navToggle.contains(e.target)) {
+                    body.classList.remove('nav-open');
+                    navToggle.setAttribute('aria-expanded', 'false');
+                    navToggle.textContent = '☰';
+                }
+            });
+            
+            // Close menu on link click
+            mainNav.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    body.classList.remove('nav-open');
+                    navToggle.setAttribute('aria-expanded', 'false');
+                    navToggle.textContent = '☰';
+                });
+            });
+        }
+        
+        // Header scroll effect
+        const header = document.querySelector('.site-header');
+        if (header) {
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll > 50) {
+                    header.classList.add('is-scrolled');
+                } else {
+                    header.classList.remove('is-scrolled');
+                }
+                lastScroll = currentScroll;
+            });
+        }
     })();
 </script>
 </body>
