@@ -4,7 +4,7 @@
         <div class="auth-shell-simple">
             <div class="auth-card-simple" data-reveal>
                 <div class="auth-card__header">
-                    <div style="font-size: 3.5rem; margin-bottom: var(--space-lg); filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));">🚗</div>
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem; filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));">🚗</div>
                     <h1 class="auth-title-simple">Регистрация</h1>
                     <p class="auth-subtitle-simple">Создайте аккаунт, чтобы арендовать автомобиль</p>
                 </div>
@@ -47,7 +47,7 @@
                         <div class="hint-simple text-muted" id="passwordMatchHint"></div>
                     </div>
 
-                    <button type="submit" class="btn-simple btn-simple--primary" style="width: 100%; margin-top: 0.5rem;">
+                    <button type="submit" class="btn-simple btn-simple--primary" style="width: 100%; margin-top: 0.25rem;">
                         Зарегистрироваться
                     </button>
                 </form>
@@ -56,7 +56,7 @@
                     Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
                 </div>
 
-                <div class="auth-bottom-simple" style="margin-top: 1rem; font-size: 0.7rem; opacity: 0.8;">
+                <div class="auth-bottom-simple" style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.7; border-top: none; padding-top: 0;">
                     🔒 Ваши данные защищены и используются только для бронирования автомобилей
                 </div>
             </div>
@@ -107,6 +107,7 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
                         }
                     });
                 }, { threshold: 0.1 });

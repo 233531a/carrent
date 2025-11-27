@@ -2866,41 +2866,60 @@ select:disabled {
         padding: var(--space-xl) 0;
     }
 }
-/* ====== MODERN AUTH DESIGN ====== */
+/* ====== MODERN COMPACT AUTH DESIGN ====== */
 .auth-shell-simple {
-    min-height: calc(100vh - 120px);
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
     background: var(--bg-primary);
-    position: relative;
-    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    overflow-y: auto;
+    z-index: 1;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* Hide header and footer on auth pages */
+.auth-page .site-header,
+.auth-page .site-footer {
+    display: none;
+}
+
+.auth-page .site-main {
+    padding: 0;
+    min-height: 100vh;
 }
 
 .auth-shell-simple::before {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: 
-        radial-gradient(ellipse 1000px 600px at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 800px 500px at 80% 70%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse 600px 400px at 50% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 1200px 700px at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 900px 600px at 80% 70%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 700px 500px at 50% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        var(--bg-primary);
     pointer-events: none;
     animation: gradientShift 20s ease-in-out infinite alternate;
+    z-index: -1;
 }
 
 .auth-card-simple {
-    width: min(480px, 100%);
+    width: min(420px, 100%);
+    max-width: 420px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-2xl);
-    padding: 3rem 2.5rem;
+    border-radius: var(--radius-xl);
+    padding: 2.5rem 2rem;
     box-shadow: var(--shadow-2xl), var(--shadow-glow);
     position: relative;
     z-index: 1;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     transition: all var(--transition-smooth);
+    margin: auto;
 }
 
 .auth-card-simple::before {
@@ -2909,25 +2928,25 @@ select:disabled {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: var(--gradient-primary);
-    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
 .auth-card-simple:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-2xl), var(--shadow-glow-hover);
 }
 
 .auth-card__header {
     text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--border);
 }
 
 .auth-title-simple {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 800;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
@@ -2941,14 +2960,14 @@ select:disabled {
 .auth-subtitle-simple {
     color: var(--text-secondary);
     margin-bottom: 0;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 
 .form-simple {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .field-simple {
@@ -3111,10 +3130,10 @@ select:disabled {
 .btn-simple {
     border: none;
     border-radius: var(--radius-lg);
-    padding: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     font-weight: 700;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all var(--transition-smooth);
     position: relative;
     overflow: hidden;
@@ -3155,11 +3174,11 @@ select:disabled {
 }
 
 .auth-bottom-simple {
-    margin-top: 2rem;
-    font-size: 0.9rem;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
     text-align: center;
-    padding-top: 1.5rem;
+    padding-top: 1.25rem;
     border-top: 1px solid var(--border);
 }
 
@@ -3233,17 +3252,31 @@ select:disabled {
 }
 
 @media (max-width: 480px) {
+    .auth-shell-simple {
+        padding: 1rem;
+    }
+    
     .auth-card-simple {
-        border-radius: var(--radius-xl);
+        border-radius: var(--radius-lg);
         padding: 2rem 1.5rem;
+        width: 100%;
+    }
+    
+    .auth-card__header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
     }
     
     .auth-title-simple {
-        font-size: 1.5rem;
+        font-size: 1.375rem;
+    }
+    
+    .auth-subtitle-simple {
+        font-size: 0.8rem;
     }
     
     .form-simple {
-        gap: 1.25rem;
+        gap: 1rem;
     }
     
     .auth-row-simple {
@@ -3253,7 +3286,12 @@ select:disabled {
     }
     
     .btn-simple {
-        padding: 0.875rem 1.25rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .field-simple input {
+        padding: 0.75rem 1rem;
         font-size: 0.95rem;
     }
 }
