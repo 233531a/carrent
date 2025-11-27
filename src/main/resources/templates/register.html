@@ -1,63 +1,163 @@
 <th:block th:with="title='Регистрация', active='register'"
           th:replace="~{_fragments/layout :: layout(${title}, ${active}, ~{::content})}">
     <th:block th:fragment="content">
-        <div class="auth-shell-simple">
-            <div class="auth-card-simple" data-reveal>
-                <div class="auth-card__header">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem; filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.3));">🚗</div>
-                    <h1 class="auth-title-simple">Регистрация</h1>
-                    <p class="auth-subtitle-simple">Создайте аккаунт, чтобы арендовать автомобиль</p>
+        <div class="auth-container">
+            <div class="auth-wrapper auth-wrapper--register">
+                <!-- Left side - Visual/Branding -->
+                <div class="auth-visual-panel">
+                    <div class="auth-visual-content">
+                        <div class="auth-logo-large">
+                            <div class="logo-icon">🚗</div>
+                            <h1 class="logo-text">Rentify</h1>
+                        </div>
+                        <div class="auth-visual-text">
+                            <h2 class="visual-title">Создайте аккаунт</h2>
+                            <p class="visual-description">Присоединяйтесь к нам и начните арендовать автомобили уже сегодня</p>
+                        </div>
+                        <div class="auth-features">
+                            <div class="feature-item">
+                                <span class="feature-icon">✓</span>
+                                <span>Широкий выбор авто</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✓</span>
+                                <span>Гибкие условия</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">✓</span>
+                                <span>Быстрая регистрация</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="auth-visual-bg">
+                        <div class="bg-shape bg-shape-1"></div>
+                        <div class="bg-shape bg-shape-2"></div>
+                        <div class="bg-shape bg-shape-3"></div>
+                    </div>
                 </div>
 
-                <div class="alert alert--warn" th:if="${error}" th:text="${error}">Ошибка регистрации</div>
-
-                <div class="alert alert--success" th:if="${success}" th:text="${success}"></div>
-
-                <form th:action="@{/register}" method="post" th:object="${form}" class="form-simple" id="registerForm">
-                    <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
-
-                    <div class="field-simple">
-                        <span>👤 Логин</span>
-                        <input type="text" name="username" placeholder="Минимум 3 символа" 
-                               minlength="3" maxlength="100" required th:field="*{username}" />
-                        <div class="hint-simple text-muted" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
-                    </div>
-
-                    <div class="field-simple">
-                        <span>🔒 Пароль</span>
-                        <div class="field-simple__pass">
-                            <input type="password" id="password" name="password" placeholder="Минимум 6 символов" 
-                                   minlength="6" required th:field="*{password}" />
-                            <button type="button" class="pass-toggle" onclick="togglePassword('password', this)" 
-                                    aria-label="Показать/скрыть пароль">👁</button>
+                <!-- Right side - Form -->
+                <div class="auth-form-panel">
+                    <div class="auth-form-card">
+                        <div class="form-header">
+                            <h2 class="form-title">Регистрация</h2>
+                            <p class="form-subtitle">Заполните форму для создания аккаунта</p>
                         </div>
-                        <div class="hint-simple text-muted" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-                        <div class="hint-simple text-muted">Используйте минимум 6 символов</div>
-                    </div>
 
-                    <div class="field-simple">
-                        <span>🔒 Подтвердите пароль</span>
-                        <div class="field-simple__pass">
-                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повторите пароль" 
-                                   minlength="6" required th:field="*{confirmPassword}" />
-                            <button type="button" class="pass-toggle" onclick="togglePassword('confirmPassword', this)" 
-                                    aria-label="Показать/скрыть пароль">👁</button>
+                        <!-- Alerts -->
+                        <div class="alert alert-error" th:if="${error}" th:text="${error}">Ошибка регистрации</div>
+                        <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+
+                        <form th:action="@{/register}" method="post" th:object="${form}" class="auth-form" id="registerForm">
+                            <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
+
+                            <div class="form-group">
+                                <label for="username" class="form-label">
+                                    <span class="label-icon">👤</span>
+                                    <span>Логин</span>
+                                </label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        id="username" 
+                                        name="username" 
+                                        class="form-input"
+                                        placeholder="Минимум 3 символа" 
+                                        minlength="3" 
+                                        maxlength="100" 
+                                        required 
+                                        th:field="*{username}" />
+                                </div>
+                                <div class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="form-label">
+                                    <span class="label-icon">🔒</span>
+                                    <span>Пароль</span>
+                                </label>
+                                <div class="input-wrapper input-wrapper-password">
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        name="password" 
+                                        class="form-input"
+                                        placeholder="Минимум 6 символов" 
+                                        minlength="6" 
+                                        required 
+                                        th:field="*{password}" />
+                                    <button 
+                                        type="button" 
+                                        class="password-toggle" 
+                                        data-visible="false"
+                                        onclick="togglePassword('password', this)" 
+                                        aria-label="Показать/скрыть пароль">
+                                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                <div class="field-hint">Используйте минимум 6 символов</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword" class="form-label">
+                                    <span class="label-icon">🔒</span>
+                                    <span>Подтвердите пароль</span>
+                                </label>
+                                <div class="input-wrapper input-wrapper-password">
+                                    <input 
+                                        type="password" 
+                                        id="confirmPassword" 
+                                        name="confirmPassword" 
+                                        class="form-input"
+                                        placeholder="Повторите пароль" 
+                                        minlength="6" 
+                                        required 
+                                        th:field="*{confirmPassword}" />
+                                    <button 
+                                        type="button" 
+                                        class="password-toggle" 
+                                        data-visible="false"
+                                        onclick="togglePassword('confirmPassword', this)" 
+                                        aria-label="Показать/скрыть пароль">
+                                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                                <div class="field-hint" id="passwordMatchHint"></div>
+                            </div>
+
+                            <button type="submit" class="btn-submit">
+                                <span>Зарегистрироваться</span>
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </form>
+
+                        <div class="form-footer">
+                            <p class="footer-text">
+                                Уже есть аккаунт? 
+                                <a th:href="@{/login}" class="footer-link">Войти</a>
+                            </p>
+                            <p class="footer-security">
+                                <span class="security-icon">🔒</span>
+                                Ваши данные защищены и используются только для бронирования автомобилей
+                            </p>
                         </div>
-                        <div class="hint-simple text-muted" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
-                        <div class="hint-simple text-muted" id="passwordMatchHint"></div>
                     </div>
-
-                    <button type="submit" class="btn-simple btn-simple--primary" style="width: 100%; margin-top: 0.25rem;">
-                        Зарегистрироваться
-                    </button>
-                </form>
-
-                <div class="auth-bottom-simple">
-                    Уже есть аккаунт? <a th:href="@{/login}">Войти</a>
-                </div>
-
-                <div class="auth-bottom-simple" style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.7; border-top: none; padding-top: 0;">
-                    🔒 Ваши данные защищены и используются только для бронирования автомобилей
                 </div>
             </div>
         </div>
@@ -65,13 +165,9 @@
         <script>
             function togglePassword(inputId, button) {
                 const input = document.getElementById(inputId);
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    button.textContent = '🙈';
-                } else {
-                    input.type = 'password';
-                    button.textContent = '👁';
-                }
+                const isVisible = input.type === 'password';
+                input.type = isVisible ? 'text' : 'password';
+                button.setAttribute('data-visible', isVisible);
             }
 
             (function() {
@@ -84,35 +180,20 @@
                 function checkMatch() {
                     if (confirmPassword.value.length === 0) {
                         hint.textContent = '';
-                        hint.className = 'hint-simple text-muted';
+                        hint.className = 'field-hint';
                         return;
                     }
                     if (password.value === confirmPassword.value) {
                         hint.textContent = '✓ Пароли совпадают';
-                        hint.className = 'hint-simple';
-                        hint.style.color = 'var(--success)';
+                        hint.className = 'field-hint success';
                     } else {
                         hint.textContent = '✗ Пароли не совпадают';
-                        hint.className = 'hint-simple';
-                        hint.style.color = 'var(--danger)';
+                        hint.className = 'field-hint error';
                     }
                 }
 
                 password.addEventListener('input', checkMatch);
                 confirmPassword.addEventListener('input', checkMatch);
-            })();
-
-            (function() {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
-
-                document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
             })();
         </script>
     </th:block>
