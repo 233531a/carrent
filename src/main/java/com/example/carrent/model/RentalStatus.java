@@ -14,8 +14,6 @@ package com.example.carrent.model;
  * Остальные статусы освобождают автомобиль для других бронирований.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 public enum RentalStatus {
     /**

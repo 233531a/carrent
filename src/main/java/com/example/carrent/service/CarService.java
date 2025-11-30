@@ -24,8 +24,6 @@ import java.util.Optional;
  * Все методы выполняются в транзакции (@Transactional).
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Service
 @Transactional

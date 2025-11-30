@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
  * - 500 Internal Server Error - ошибка сервера
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-11-25
  */
 @RestController
 @RequestMapping("/api/cars")
@@ -67,22 +65,22 @@ public class CarRestController {
      * Возвращает массив JSON объектов CarDTO.
      * Используйте параметры фильтрации в методе search() для более точных запросов.
      *
-     * Пример ответа:
-     * [
-     *   {
-     *     "id": 1,
-     *     "brand": "Toyota",
-     *     "model": "Camry",
-     *     "pricePerDay": 5000.00,
-     *     "vehicleClass": "business",
-     *     "transmission": "AT",
-     *     "year": 2023,
-     *     "available": true,
-     *     "photoUrl": "/images/camry.jpg",
-     *     "catalog": "REGULAR"
-     *   },
-     *   ...
-     * ]
+ * Пример ответа:
+ * [
+ *   {
+ *     "id": 1,
+ *     "brand": "Toyota",
+ *     "model": "Camry",
+ *     "pricePerDay": 5000.00,
+ *     "vehicleClass": "business",
+ *     "transmission": "AT",
+ *     "year": YYYY,
+ *     "available": true,
+ *     "photoUrl": "/images/camry.jpg",
+ *     "catalog": "REGULAR"
+ *   },
+ *   ...
+ * ]
      *
      * @return ResponseEntity со списком всех автомобилей в формате CarDTO
      */
@@ -123,18 +121,18 @@ public class CarRestController {
      * Тело запроса должно содержать JSON с данными автомобиля.
      * Поля с @NotBlank, @Min, @Max и другими аннотациями валидируются автоматически.
      *
-     * Пример тела запроса:
-     * {
-     *   "brand": "Toyota",
-     *   "model": "Camry",
-     *   "pricePerDay": 5000.00,
-     *   "vehicleClass": "business",
-     *   "transmission": "AT",
-     *   "year": 2023,
-     *   "available": true,
-     *   "photoUrl": "/images/camry.jpg",
-     *   "catalog": "REGULAR"
-     * }
+ * Пример тела запроса:
+ * {
+ *   "brand": "Toyota",
+ *   "model": "Camry",
+ *   "pricePerDay": 5000.00,
+ *   "vehicleClass": "business",
+ *   "transmission": "AT",
+ *   "year": YYYY,
+ *   "available": true,
+ *   "photoUrl": "/images/camry.jpg",
+ *   "catalog": "REGULAR"
+ * }
      *
      * @param carDTO данные нового автомобиля (валидируются через @Valid)
      * @return ResponseEntity с созданным CarDTO и статус 201 Created

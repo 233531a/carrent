@@ -26,8 +26,6 @@ import org.springframework.security.web.SecurityFilterChain;
  * - Определение страниц входа/выхода
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Configuration
 @EnableWebSecurity

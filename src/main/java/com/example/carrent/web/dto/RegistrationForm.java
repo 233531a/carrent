@@ -10,8 +10,6 @@ import jakarta.validation.constraints.Size;
  * Содержит валидационные аннотации для проверки корректности введенных данных.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 public class RegistrationForm {
 

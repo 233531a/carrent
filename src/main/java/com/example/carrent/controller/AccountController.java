@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
  * Доступ: только авторизованные пользователи (настроено в SecurityConfig).
  *
  * @author Система аренды автомобилей
- * @version 1.1
- * @since 2025-11-25
  */
 @Controller
 public class AccountController {

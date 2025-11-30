@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
  * Все операции выполняются в транзакции для обеспечения целостности данных.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Service
 public class AdminUserService {

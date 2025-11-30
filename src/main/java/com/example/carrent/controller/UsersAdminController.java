@@ -26,8 +26,6 @@ import java.util.Set;
  * Доступен только пользователям с ролью ADMIN.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 @RequestMapping("/admin/users")

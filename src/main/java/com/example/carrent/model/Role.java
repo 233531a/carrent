@@ -15,8 +15,6 @@ import jakarta.persistence.*;
  * - ROLE_ADMIN: администратор, полный доступ ко всем функциям
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Entity
 @Table(

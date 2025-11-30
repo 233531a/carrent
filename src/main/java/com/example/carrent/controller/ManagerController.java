@@ -29,8 +29,6 @@ import java.util.Optional;
  * Доступен пользователям с ролями MANAGER или ADMIN.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 @RequestMapping("/manager")

@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
  * 4. Spring Security сравнивает пароли и проверяет права доступа
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

@@ -10,8 +10,6 @@ package com.example.carrent.model;
  * - автомобили для доставки
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 public enum CatalogType {
     /**

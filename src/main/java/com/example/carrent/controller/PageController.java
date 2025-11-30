@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
  * в CarController, чтобы избежать дублирования.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 public class PageController {

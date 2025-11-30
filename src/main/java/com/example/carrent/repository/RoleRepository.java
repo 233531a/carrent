@@ -12,8 +12,6 @@ import java.util.Optional;
  * Наследует стандартные методы CRUD от JpaRepository.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 public interface RoleRepository extends JpaRepository<Role, Long> {
 

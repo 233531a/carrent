@@ -18,8 +18,6 @@ import java.util.List;
  * с информацией о количестве автомобилей и топовыми автомобилями.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 public class HomeController {

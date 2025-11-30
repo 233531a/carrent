@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
  * - Обработку регистрации новых пользователей
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 public class AuthController {

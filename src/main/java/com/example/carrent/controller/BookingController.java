@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
  * Сотрудники, менеджеры и администраторы могут бронировать все типы автомобилей.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 @RequestMapping("/booking")
@@ -219,7 +217,7 @@ public class BookingController {
     /**
      * REST endpoint для проверки доступности автомобилей на указанные даты.
      *
-     * GET /booking/api/available-cars?startDate=2025-01-01&endDate=2025-01-05
+     * GET /booking/api/available-cars?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
      *
      * Используется JavaScript для динамического обновления списка автомобилей
      * при изменении дат на странице бронирования.

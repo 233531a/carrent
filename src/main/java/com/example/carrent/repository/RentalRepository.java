@@ -18,8 +18,6 @@ import java.util.List;
  * Наследует стандартные методы CRUD от JpaRepository.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Repository
 public interface RentalRepository extends JpaRepository<Rental, Long> {

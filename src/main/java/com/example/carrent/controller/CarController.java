@@ -28,8 +28,6 @@ import java.util.stream.Collectors;
  * Поддерживает фильтрацию и сортировку автомобилей.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Controller
 public class CarController {

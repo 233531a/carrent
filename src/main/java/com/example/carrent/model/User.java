@@ -17,8 +17,6 @@ import java.util.Set;
  * Используется Spring Security для проверки прав доступа.
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Entity
 @Table(name = "users")

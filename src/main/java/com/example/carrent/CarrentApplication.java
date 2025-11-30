@@ -13,8 +13,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * - Запускает встроенный сервер (Tomcat) на порту 8080
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @SpringBootApplication
 public class CarrentApplication {

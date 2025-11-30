@@ -26,15 +26,13 @@ import java.util.Map;
  *
  * Формат ответа при ошибке:
  * {
- *   "timestamp": "2025-11-25T13:45:30",
+ *   "timestamp": "YYYY-MM-DDTHH:mm:ss",
  *   "status": 400,
  *   "error": "Bad Request",
  *   "message": "Подробное описание ошибки"
  * }
  *
  * @author Система аренды автомобилей
- * @version 1.1
- * @since 2025-11-25
  */
 @RestControllerAdvice
 public class RestExceptionHandler {
@@ -44,15 +42,15 @@ public class RestExceptionHandler {
      *
      * Возвращает 400 Bad Request с детальным списком полей, которые не прошли валидацию.
      *
-     * Пример ответа:
-     * {
-     *   "timestamp": "2025-11-25T13:45:30",
-     *   "status": 400,
-     *   "errors": {
-     *     "make": "не должно быть пустым",
-     *     "year": "должно быть больше или равно 1980"
-     *   }
-     * }
+ * Пример ответа:
+ * {
+ *   "timestamp": "YYYY-MM-DDTHH:mm:ss",
+ *   "status": 400,
+ *   "errors": {
+ *     "make": "не должно быть пустым",
+ *     "year": "должно быть больше или равно 1980"
+ *   }
+ * }
      *
      * @param ex исключение с деталями ошибок валидации
      * @return ResponseEntity с кодом 400 и списком ошибок

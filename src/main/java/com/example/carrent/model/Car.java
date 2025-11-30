@@ -19,8 +19,6 @@ import java.time.LocalDateTime;
  * Автоматически управляет временными метками (createdAt, updatedAt).
  *
  * @author Система аренды автомобилей
- * @version 1.0
- * @since 2025-01-25
  */
 @Entity
 @Table(name = "cars")

@@ -17,8 +17,6 @@ import jakarta.persistence.*;
  * - Идентификации клиента при бронировании
  *
  * @author Система аренды автомобилей
- * @version 1.1
- * @since 2025-01-25
  */
 @Entity
 @Table(name = "customers")
