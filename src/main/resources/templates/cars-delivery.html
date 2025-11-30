@@ -3,46 +3,35 @@
           xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <th:block th:fragment="content">
 
-        <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom: var(--space-md);">
-            <span class="chip"
-                  th:text="${mode == 'taxi' ? 'Спец-подборка для такси'
-                                 : (mode == 'delivery' ? 'Спец-подборка для доставки' : mode)}">Режим</span>
-            <p class="text-muted" style="margin-top: var(--space-sm);">Здесь показываются автомобили для выбранного направления.</p>
+        <div class="card" th:if="${mode != null and mode != 'regular'}" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--primary);">
+            <div style="display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;">
+                <span class="chip" 
+                      th:classappend="${mode == 'taxi' ? ' chip--ok' : ' chip--warn'}"
+                      th:text="${mode == 'taxi' ? '🚕 Спец-подборка для такси'
+                                 : (mode == 'delivery' ? '📦 Спец-подборка для доставки' : mode)}">
+                    Режим
+                </span>
+                <p class="text-muted" style="margin: 0;">Здесь показываются автомобили для выбранного направления.</p>
+            </div>
         </div>
 
-        <h2 class="page-title">Каталог автомобилей для доставки</h2>
-
-        <form class="card form form--filters filters-v2" th:action="@{/cars/delivery}" method="get">
-            <div class="filters-v2__bar">
-                <button class="btn btn--sm" type="submit">Фильтр</button>
-                <a class="btn btn--sm btn--light" th:href="@{/cars/delivery}">Сброс</a>
+        <div class="page-head">
+            <h2 class="page-title" style="margin: 0;">Каталог автомобилей для доставки</h2>
+            <div class="head-actions">
+                <span class="text-muted" th:if="${cars != null}">
+                    Найдено: <strong th:text="${#lists.size(cars)}">0</strong>
+                </span>
             </div>
-            <div class="form__grid">
-                <div>
-                    <label>Марка/Модель</label>
-                    <input type="text" name="q" placeholder="Например, Toyota" th:value="${q}">
-                </div>
-                <div>
-                    <label>Класс</label>
-                    <select name="vehicleClass" th:value="${vehicleClass}">
-                        <option value="">Любой</option>
-                        <option>Эконом</option><option>Комфорт</option><option>Бизнес</option>
-                        <option>Паркетник</option><option>Внедорожник</option><option>Премиум</option>
-                    </select>
-                </div>
-                <div>
-                    <label>КПП</label>
-                    <select name="transmission" th:value="${transmission}">
-                        <option value="">Любая</option><option>AT</option><option>MT</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Цена до, ₽/день</label>
-                    <input type="number" name="maxPrice" step="100" th:value="${maxPrice}">
-                </div>
-                <div>
+        </div>
+
+        <form class="card form" method="get"
+              th:if="${mode != null and mode != 'regular'}"
+              th:action="@{/cars/delivery}"
+              style="margin-bottom: var(--space-xl);">
+            <div class="form__grid form__grid--single">
+                <div class="field">
                     <label>Сортировка</label>
-                    <select name="sort" th:value="${sort}">
+                    <select name="sort" th:value="${sort}" onchange="this.form.submit()">
                         <option th:value="${null}" th:selected="${sort==null}">Без сортировки</option>
                         <option value="price_asc"  th:selected="${sort=='price_asc'}">Цена ↑</option>
                         <option value="price_desc" th:selected="${sort=='price_desc'}">Цена ↓</option>
@@ -51,56 +40,76 @@
                     </select>
                 </div>
             </div>
-            <div class="form__actions">
-                <button class="btn" type="submit">Фильтровать</button>
-                <a class="btn btn--light" th:href="@{/cars/delivery}">Сбросить</a>
-            </div>
         </form>
 
-        <div class="grid grid--3" th:if="${#lists.size(cars) > 0}">
-            <article class="card car car--v2 card--hover" th:each="c : ${cars}">
-                <div class="car__media">
-                    <div class="img-skel shimmer">
-                        <img
-                                th:src="${c != null and c.photoUrl != null and !#strings.isEmpty(c.photoUrl) ?
-                                ((c.photoUrl.startsWith('http') or c.photoUrl.startsWith('/'))
-                                    ? c.photoUrl
-                                    : '/images/' + c.photoUrl)
-                               : '/images/placeholder-car.jpg'}"
-                                alt="" loading="lazy"
-                                onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+        <div class="scroller" th:if="${#lists.size(cars) > 0}">
+            <article class="car-card" th:each="c : ${cars}" data-reveal>
+                <a class="car-card__media" th:href="@{/cars/{id}(id=${c.id})}">
+                    <img
+                        th:src="${c != null and c.photoUrl != null and !#strings.isEmpty(c.photoUrl) ?
+                            ((c.photoUrl.startsWith('http') or c.photoUrl.startsWith('/'))
+                                ? c.photoUrl
+                                : '/images/' + c.photoUrl)
+                           : '/images/placeholder-car.jpg'}"
+                        th:alt="${c.make + ' ' + c.model}"
+                        loading="lazy"
+                        onerror="this.onerror=null;this.src='/images/placeholder-car.jpg';">
+                </a>
+                <div class="car-card__body">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-sm);">
+                        <h3 class="car-card__title" th:text="${c.make + ' ' + c.model}">Make Model</h3>
+                        <span class="chip" 
+                              th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'"
+                              th:text="${c.available} ? 'Доступен' : 'Недоступен'">
+                            Статус
+                        </span>
                     </div>
-                </div>
-
-                <div class="car__head">
-                    <h3 th:text="${c.make + ' ' + c.model}">Make Model</h3>
-                    <span class="chip" th:text="${c.available} ? 'Доступен' : 'Недоступен'"
-                          th:classappend="${c.available} ? ' chip--ok' : ' chip--warn'">Статус</span>
-                </div>
-
-                <p class="text-muted">
-                    <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span> •
-                    <span th:text="'КПП: ' + ${c.transmission}">Transmission</span> •
-                    <span th:text="'Год: ' + ${c.year}">Year</span>
-                </p>
-
-                <div class="car__price">
-                    <div class="price"
-                         th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">0 ₽/день</div>
-
-                    <div class="hero__actions" style="margin-top: var(--space-sm);">
-                        <a class="btn btn--sm" th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
+                    <div class="car-card__tags">
+                        <span th:text="'Класс: ' + ${c.vehicleClass}">Class</span>
+                        <span th:text="'КПП: ' + ${c.transmission}">Transmission</span>
+                        <span th:text="'Год: ' + ${c.year}">Year</span>
                     </div>
-
-                    <a class="btn" th:href="@{/booking(carId=${c.id})}" sec:authorize="isAuthenticated()">Забронировать</a>
-                    <a class="btn btn--light" th:href="@{/login(from='booking')}" sec:authorize="isAnonymous()">Забронировать</a>
+                    <div class="car-card__foot">
+                        <div class="price" th:text="${#numbers.formatDecimal(c.dailyPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽/день'">
+                            0 ₽/день
+                        </div>
+                        <div style="display: flex; gap: var(--space-sm);">
+                            <a class="btn btn--sm" th:href="@{/cars/{id}(id=${c.id})}">Подробнее</a>
+                            <a class="btn btn--sm" 
+                               th:href="@{/booking(carId=${c.id})}" 
+                               sec:authorize="isAuthenticated()"
+                               th:if="${c.available}">
+                                Забронировать
+                            </a>
+                            <a class="btn btn--sm btn--light" 
+                               th:href="@{/login(from='booking')}" 
+                               sec:authorize="isAnonymous()">
+                                Забронировать
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </article>
         </div>
 
         <div class="empty" th:if="${#lists.size(cars) == 0}">
-            <p>Ничего не найдено. Измените фильтры.</p>
+            <div style="font-size: 4rem; margin-bottom: var(--space-md);">🚗</div>
+            <p style="font-size: var(--font-size-lg); margin-bottom: var(--space-sm);">Ничего не найдено</p>
+            <p class="text-muted">Попробуйте изменить параметры фильтров или <a th:href="@{/cars/delivery}">сбросить их</a>.</p>
         </div>
 
+        <script>
+            (function() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+            })();
+        </script>
     </th:block>
 </th:block>
